@@ -1,10 +1,24 @@
 from django.urls import path
-# from . views import (
-#     CustomAuthToken,
-# )
+from . views import (
+    # Customer Views
+    CreateCustomerView,
+
+    # Driver Views
+    CreateDriverView,
+
+    # Truck Views
+    CreateTruckView,
+)
 
 app_name = "customer"
 
 urlpatterns = [
-    #  path('get-token/', CustomAuthToken.as_view(), name="get-token")
+     # Customer urls
+     path('', CreateCustomerView.as_view(), name="customer"),
+
+     # Driver urls
+     path('drivers/', CreateDriverView.as_view(), name="drivers"),
+
+     # Truck urls
+     path('trucks/', CreateTruckView.as_view(), name="trucks"),
 ]

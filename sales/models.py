@@ -9,7 +9,7 @@ class Sale(models.Model):
     customer        = models.ForeignKey(Customer, on_delete=models.PROTECT)
     depot           = models.ForeignKey(Depot, on_delete=models.PROTECT)
     product         = models.ForeignKey(Product, on_delete=models.PROTECT)
-    truck           = models.ForeignKey(Truck, on_delete=models.PROTECT)
+    truck           = models.ForeignKey(Truck, on_delete=models.SET_NULL, null=True, blank=True)
 
     #Atrributes
     entry_no        = models.CharField(max_length=50)

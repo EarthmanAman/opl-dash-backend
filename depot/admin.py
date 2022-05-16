@@ -1,3 +1,8 @@
 from django.contrib import admin
+from . models import (
+    Depot,  
+    DepotManager,   
+)
 
-# Register your models here.
+admin.site.register(Depot)
+admin.site.register(DepotManager)
