@@ -29,5 +29,5 @@ class Truck(models.Model):
     is_hired    = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return self.customer.__str__() + " : " + self.driver.__str__() + " : " + self.plate_no
+        return self.driver.__str__() + " : " + self.plate_no
 

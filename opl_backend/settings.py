@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     'corsheaders',
     'import_export',
+    'silk',
 
     # APPS
     "accounts",
@@ -68,6 +69,7 @@ MIDDLEWARE = [
 
     # Third party middleware
     'corsheaders.middleware.CorsMiddleware',
+    'silk.middleware.SilkyMiddleware',
 ]
 
 ROOT_URLCONF = 'opl_backend.urls'
@@ -87,6 +89,27 @@ TEMPLATES = [
         },
     },
 ]
+
+# SQL ANALYSIS
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+#     'loggers': {
+#         'django.db.backends': {
+#             'level': 'DEBUG',
+#             'handlers': ['console'],
+#         }
+#     },
+# }
+
+# SILK SETTINGS
+SILKY_PYTHON_PROFILER = True
+
 
 WSGI_APPLICATION = 'opl_backend.wsgi.application'
 
@@ -158,6 +181,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = "static"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

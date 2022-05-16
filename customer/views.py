@@ -1,4 +1,5 @@
 from rest_framework.generics import ListCreateAPIView
+from rest_framework.response import Response
 
 # Local imports
 from . models import Customer, Driver, Truck
@@ -6,6 +7,7 @@ from . models import Customer, Driver, Truck
 from . serializers import (
     # Create serializers
     CreateCustomerSer,
+    RetrieveCustomerSer,
 
     # Drivers serializers
     CreateDriverSer,
@@ -20,6 +22,20 @@ class CreateCustomerView(ListCreateAPIView):
     serializer_class = CreateCustomerSer
     queryset = Customer.objects.all()
 
+    def get(self, request, *args, **kwargs):
+        entries = Customer.objects.all()
+        serializer = RetrieveCustomerSer(entries, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, *args, **kwargs):
+        serializer = CreateCustomerSer(data=request.data)
+
+        if serializer.is_valid():
+            sale = serializer.save()
+            serializer = RetrieveCustomerSer(sale)
+            return Response(serializer.data)
+        else:
+            print(serializer.errors)
 # Driver Views
 class CreateDriverView(ListCreateAPIView):
     serializer_class = CreateDriverSer
