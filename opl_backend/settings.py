@@ -48,6 +48,13 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     'corsheaders',
     'import_export',
+
+    # APPS
+    "accounts",
+    "customer",
+    "depot",
+    "product",
+    "sales",
 ]
 
 MIDDLEWARE = [
