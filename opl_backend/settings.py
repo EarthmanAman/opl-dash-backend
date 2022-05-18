@@ -31,7 +31,7 @@ SECRET_KEY =  env("SECRET_KEY")
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-
+CACHEOPS_REDIS = "redis://localhost:6379/1"
 
 # Application definition
 
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     # THIRD PARTIES
     "rest_framework",
     "rest_framework.authtoken",
+    "cacheops",
     'corsheaders',
     'import_export',
     'silk',
@@ -107,6 +108,14 @@ TEMPLATES = [
 #     },
 # }
 
+
+#CACHEOPS
+CACHEOPS = {
+    'sales.*': {'ops': {"all", "get", 'fetch'}, 'timeout': 60*60},
+    'customer.*': {'ops': {"all", "get", 'fetch'}, 'timeout': 60*60},
+    'depot.*': {'ops': {"all", "get", 'fetch'}, 'timeout': 60*60},
+    'product.*': {'ops': {"all", "get", 'fetch'}, 'timeout': 60*60},
+}
 # SILK SETTINGS
 SILKY_PYTHON_PROFILER = True
 
@@ -162,7 +171,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
     # 'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.PageNumberPagination',
-    #                             'PAGE_SIZE':1
+    #                             'PAGE_SIZE':1,
 }
 
 # Internationalization

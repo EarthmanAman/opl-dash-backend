@@ -12,8 +12,8 @@ class Sale(models.Model):
     truck           = models.ForeignKey(Truck, on_delete=models.SET_NULL, null=True, blank=True)
 
     #Atrributes
-    entry_no        = models.CharField(max_length=50)
-    date            = models.DateTimeField()
+    entry_no        = models.CharField(max_length=50, null=True)
+    date            = models.DateField()
     is_paid         = models.BooleanField(default=True)
     is_loaded       = models.BooleanField(default=True)
     lpo_no          = models.CharField(max_length=50, null=True)
@@ -23,4 +23,4 @@ class Sale(models.Model):
     vol_20          = models.FloatField(null=True, blank=True)
 
     def __str__(self) -> str:
-        return self.customer.__str__() + " : " + self.product.__str__() + " : " + self.order_no
+        return self.customer.__str__() + " : " + self.product.__str__() + " : " + self.order_no + " : " + str(self.date)

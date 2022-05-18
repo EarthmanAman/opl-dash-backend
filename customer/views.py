@@ -1,4 +1,5 @@
-from rest_framework.generics import ListCreateAPIView
+from django.contrib.auth.models import User
+from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from rest_framework.response import Response
 
 # Local imports
@@ -14,6 +15,7 @@ from . serializers import (
 
     # Truck Serializers
     CreateTruckSer,
+    TopCustomerMonthSer,
 )
 
 
@@ -45,3 +47,9 @@ class CreateDriverView(ListCreateAPIView):
 class CreateTruckView(ListCreateAPIView):
     serializer_class = CreateTruckSer
     queryset = Truck.objects.all()
+
+class TopCustomerMonthView(RetrieveAPIView):
+    serializer_class = TopCustomerMonthSer
+    queryset = User.objects.all()
+
+

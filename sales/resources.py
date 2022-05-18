@@ -8,25 +8,31 @@ from product.models import Product
 from . models import Sale
 
 class SaleResource(resources.ModelResource):
-    # customer = fields.Field(
-    #     column_name='customer',
-    #     attribute ='customer',
-    #     widget=ForeignKeyWidget(Customer, 'name'))
-    # depot = fields.Field(
-    #     widget=ForeignKeyWidget(Depot, 'name'))
-    # product = fields.Field(
-    #     widget=ForeignKeyWidget(Product, 'name'))
-    # truck = fields.Field(
-    #     widget=ForeignKeyWidget(Truck, 'plate_no'))
+    customer = fields.Field(
+        column_name='customer',
+        attribute ='customer',
+        widget=ForeignKeyWidget(Customer, 'name'))
+    depot = fields.Field(
+        column_name='depot',
+        attribute ='depot',
+        widget=ForeignKeyWidget(Depot, 'name'))
+    product = fields.Field(
+        column_name='product',
+        attribute ='product',
+        widget=ForeignKeyWidget(Product, 'name'))
+    truck = fields.Field(
+        column_name='truck',
+        attribute ='truck',
+        widget=ForeignKeyWidget(Truck, 'plate_no'))
 
     class Meta:
         model = Sale
         fields = (
             "id",
-            "customer__name", 
-            "depot__name", 
-            "product__name", 
-            "truck__plate_no", 
+            "customer", 
+            "depot", 
+            "product", 
+            "truck", 
             "entry_no", 
             "date", 
             "is_paid", 
