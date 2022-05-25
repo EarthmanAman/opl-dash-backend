@@ -56,7 +56,6 @@ class DepotMonthSer(ModelSerializer):
                         )
                     )
                     .values("date__month", "sum")
-                    .cache()
                 )
             # total = totals.aggregate(total=Sum("sum"))
             y.append({"year": year, "months": totals})

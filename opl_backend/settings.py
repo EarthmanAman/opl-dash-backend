@@ -31,7 +31,7 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-CACHEOPS_REDIS = "redis://localhost:6379/1"
+# CACHEOPS_REDIS = "redis://localhost:6379/1"
 
 # Application definition
 
@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     # THIRD PARTIES
     "rest_framework",
     "rest_framework.authtoken",
-    "cacheops",
+    # "cacheops",
     "corsheaders",
     "import_export",
     "silk",
@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "accounts",
     "customer",
     "depot",
+    "main",
     "product",
     "sales",
 ]
@@ -107,12 +108,12 @@ TEMPLATES = [
 
 
 # CACHEOPS
-CACHEOPS = {
-    "sales.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
-    "customer.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
-    "depot.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
-    "product.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
-}
+# CACHEOPS = {
+#     "sales.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
+#     "customer.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
+#     "depot.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
+#     "product.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
+# }
 # SILK SETTINGS
 SILKY_PYTHON_PROFILER = True
 
@@ -187,9 +188,10 @@ USE_TZ = True
 STATIC_URL = "/static/"
 # STATIC_ROOT = "static"
 STATICFILES_DIRS = [
-    # os.path.join(BASE_DIR, 'build', 'static'),
+    os.path.join(BASE_DIR, "build", "static"),
     os.path.join(BASE_DIR, "static"),
 ]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 

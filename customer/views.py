@@ -3,19 +3,18 @@ from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from rest_framework.response import Response
 
 # Local imports
-from . models import Customer, Driver, Truck
+from .models import Customer, Driver, Truck
 
-from . serializers import (
+from .serializers import (
     # Create serializers
     CreateCustomerSer,
     RetrieveCustomerSer,
-
     # Drivers serializers
     CreateDriverSer,
-
     # Truck Serializers
     CreateTruckSer,
     TopCustomerMonthSer,
+    CustomerMonthSer,
 )
 
 
@@ -25,8 +24,8 @@ class CreateCustomerView(ListCreateAPIView):
     queryset = Customer.objects.all()
 
     def get(self, request, *args, **kwargs):
-        entries = Customer.objects.all()
-        serializer = RetrieveCustomerSer(entries, many=True)
+        entries = Customer.objects.all().order_by("name").prefetch_related("sale_set")
+        serializer = CustomerMonthSer(entries, many=True)
         return Response(serializer.data)
 
     def post(self, request, *args, **kwargs):
@@ -38,18 +37,20 @@ class CreateCustomerView(ListCreateAPIView):
             return Response(serializer.data)
         else:
             print(serializer.errors)
+
+
 # Driver Views
 class CreateDriverView(ListCreateAPIView):
     serializer_class = CreateDriverSer
     queryset = Driver.objects.all()
+
 
 # Driver Views
 class CreateTruckView(ListCreateAPIView):
     serializer_class = CreateTruckSer
     queryset = Truck.objects.all()
 
+
 class TopCustomerMonthView(RetrieveAPIView):
     serializer_class = TopCustomerMonthSer
     queryset = User.objects.all()
-
-
