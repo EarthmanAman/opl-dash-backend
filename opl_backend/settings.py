@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import os
 from pathlib import Path
 import environ
+import redis
 
 env = environ.Env()
 # reading .env file
@@ -31,7 +32,13 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-# CACHEOPS_REDIS = "redis://localhost:6379/1"
+# CACHEOPS_REDIS = redis.StrictRedis(
+#     host="opl.redis.cache.windows.net",
+#     port=6380,
+#     db=0,
+#     password="MfXXHYfnC0sKzplqrNPozP49CW1i7SknPAzCaOX3Yqw=",
+#     ssl=True,
+# )
 
 # Application definition
 
@@ -45,7 +52,7 @@ INSTALLED_APPS = [
     # THIRD PARTIES
     "rest_framework",
     "rest_framework.authtoken",
-    # "cacheops",
+    "cacheops",
     "corsheaders",
     "import_export",
     "silk",
@@ -107,14 +114,24 @@ TEMPLATES = [
 #     },
 # }
 
+CACHEOPS_REDIS = {
+    "host": "opl.redis.cache.windows.net",  # redis-server is on same machine
+    "port": 6380,  # default redis port
+    "db": 0,  # SELECT non-default redis database
+    # using separate redis db or redis instance
+    # is highly recommended
+    "socket_timeout": 10,  # connection timeout in seconds, optional
+    "password": "MfXXHYfnC0sKzplqrNPozP49CW1i7SknPAzCaOX3Yqw=",  # optional
+    "unix_socket_path": "opl.redis.cache.windows.net:6380",  # replaces host and port
+}
 
 # CACHEOPS
-# CACHEOPS = {
-#     "sales.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
-#     "customer.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
-#     "depot.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
-#     "product.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
-# }
+CACHEOPS = {
+    "sales.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
+    "customer.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
+    "depot.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
+    "product.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
+}
 # SILK SETTINGS
 SILKY_PYTHON_PROFILER = True
 
