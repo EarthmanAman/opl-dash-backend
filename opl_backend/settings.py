@@ -186,10 +186,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = "/static/"
-# STATIC_ROOT = "static"
+STATIC_ROOT = "static"
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "build", "static"),
-    os.path.join(BASE_DIR, "static"),
+    # os.path.join(BASE_DIR, "static"),
 ]
 
 # Default primary key field type
@@ -197,7 +197,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-CSRF_TRUSTED_ORIGINS = ["https://opl.azurewebsites.net"]
+CSRF_TRUSTED_ORIGINS = ["https://opl.azurewebsites.net", "http://opl.azurewebsites.net"]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
