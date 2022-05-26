@@ -122,7 +122,7 @@ CACHEOPS_REDIS = {
     # is highly recommended
     "socket_timeout": 10,  # connection timeout in seconds, optional
     "password": "MfXXHYfnC0sKzplqrNPozP49CW1i7SknPAzCaOX3Yqw=",  # optional
-    "unix_socket_path": "opl.redis.cache.windows.net:6380",  # replaces host and port
+    # "unix_socket_path": "opl.redis.cache.windows.net:6380",  # replaces host and port
 }
 
 # CACHEOPS
