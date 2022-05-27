@@ -1,3 +1,4 @@
+import datetime
 from django.shortcuts import render
 from rest_framework.generics import (
     ListCreateAPIView,
@@ -39,7 +40,20 @@ class CreateSaleView(ListCreateAPIView):
     queryset = Sale.objects.all().select_related()
 
     def get(self, request, *args, **kwargs):
-        entries = Sale.objects.all().select_related()
+        start_date = request.GET.get("start_date", None)
+        end_date = request.GET.get("end_date", None)
+        if start_date != None and end_date != None:
+            start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
+            end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+            entries = (
+                Sale.objects.filter(date__gte=start_date)
+                .filter(date__lte=end_date)
+                .order_by("-date")
+                .select_related()
+            )
+        else:
+            entries = Sale.objects.all().select_related()
+
         serializer = RetrieveSaleSer(entries, many=True)
         return Response(serializer.data)
 

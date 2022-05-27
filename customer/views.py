@@ -25,7 +25,7 @@ class CreateCustomerView(ListCreateAPIView):
 
     def get(self, request, *args, **kwargs):
         entries = Customer.objects.all().order_by("name").prefetch_related("sale_set")
-        serializer = CustomerMonthSer(entries, many=True)
+        serializer = RetrieveCustomerSer(entries, many=True)
         return Response(serializer.data)
 
     def post(self, request, *args, **kwargs):
@@ -37,6 +37,11 @@ class CreateCustomerView(ListCreateAPIView):
             return Response(serializer.data)
         else:
             print(serializer.errors)
+
+
+class CustomerDetailView(RetrieveAPIView):
+    serializer_class = CustomerMonthSer
+    queryset = Customer.objects.all().prefetch_related("sale_set")
 
 
 # Driver Views

@@ -32,13 +32,7 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-# CACHEOPS_REDIS = redis.StrictRedis(
-#     host="opl.redis.cache.windows.net",
-#     port=6380,
-#     db=0,
-#     password="MfXXHYfnC0sKzplqrNPozP49CW1i7SknPAzCaOX3Yqw=",
-#     ssl=True,
-# )
+CACHEOPS_REDIS = "redis://localhost:6379/1"
 
 # Application definition
 
@@ -114,16 +108,16 @@ TEMPLATES = [
 #     },
 # }
 
-CACHEOPS_REDIS = {
-    "host": "opl.redis.cache.windows.net",  # redis-server is on same machine
-    "port": 6379,  # default redis port
-    "db": 1,  # SELECT non-default redis database
-    # using separate redis db or redis instance
-    # is highly recommended
-    # "socket_timeout": 10,  # connection timeout in seconds, optional
-    "password": "0HMEsu38GiAYpF7ywUecv9oCqZGRxhWZaAzCaKiAcac=",  # optional
-    # "unix_socket_path": "opl.redis.cache.windows.net:6380",  # replaces host and port
-}
+# CACHEOPS_REDIS = {
+#     "host": "opl.redis.cache.windows.net",  # redis-server is on same machine
+#     "port": 6379,  # default redis port
+#     "db": 1,  # SELECT non-default redis database
+#     # using separate redis db or redis instance
+#     # is highly recommended
+#     # "socket_timeout": 10,  # connection timeout in seconds, optional
+#     "password": "0HMEsu38GiAYpF7ywUecv9oCqZGRxhWZaAzCaKiAcac=",  # optional
+#     # "unix_socket_path": "opl.redis.cache.windows.net:6380",  # replaces host and port
+# }
 
 # CACHEOPS
 CACHEOPS = {
