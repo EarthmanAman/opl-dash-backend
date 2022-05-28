@@ -59,3 +59,9 @@ class CreateTruckView(ListCreateAPIView):
 class TopCustomerMonthView(RetrieveAPIView):
     serializer_class = TopCustomerMonthSer
     queryset = User.objects.all()
+
+    def get_serializer_context(self):
+        year = self.request.GET.get("year", None)
+        month = self.request.GET.get("month", None)
+
+        return {"year": year, "month": month}

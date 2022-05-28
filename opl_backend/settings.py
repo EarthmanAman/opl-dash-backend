@@ -108,24 +108,24 @@ TEMPLATES = [
 #     },
 # }
 
-CACHEOPS_REDIS = {
-    "host": "opl.redis.cache.windows.net",  # redis-server is on same machine
-    "port": 6379,  # default redis port
-    "db": 1,  # SELECT non-default redis database
-    # using separate redis db or redis instance
-    # is highly recommended
-    # "socket_timeout": 10,  # connection timeout in seconds, optional
-    "password": "0HMEsu38GiAYpF7ywUecv9oCqZGRxhWZaAzCaKiAcac=",  # optional
-    # "unix_socket_path": "opl.redis.cache.windows.net:6380",  # replaces host and port
-}
+# CACHEOPS_REDIS = {
+#     "host": "opl.redis.cache.windows.net",  # redis-server is on same machine
+#     "port": 6379,  # default redis port
+#     "db": 1,  # SELECT non-default redis database
+#     # using separate redis db or redis instance
+#     # is highly recommended
+#     # "socket_timeout": 10,  # connection timeout in seconds, optional
+#     "password": "0HMEsu38GiAYpF7ywUecv9oCqZGRxhWZaAzCaKiAcac=",  # optional
+#     # "unix_socket_path": "opl.redis.cache.windows.net:6380",  # replaces host and port
+# }
 
 # CACHEOPS
-CACHEOPS = {
-    "sales.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
-    "customer.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
-    "depot.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
-    "product.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
-}
+# CACHEOPS = {
+#     "sales.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
+#     "customer.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
+#     "depot.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
+#     "product.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
+# }
 # SILK SETTINGS
 SILKY_PYTHON_PROFILER = True
 

@@ -26,10 +26,22 @@ class ProductSeriesView(ListAPIView):
     serializer_class = ProductSeriesSer
     queryset = Product.objects.all()
 
+    def get_serializer_context(self):
+        start_date = self.request.GET.get("start_date", None)
+        end_date = self.request.GET.get("end_date", None)
+        if start_date and end_date:
+            start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
+            end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+        return {"start_date": start_date, "end_date": end_date}
+
 
 class ProductMonthView(ListAPIView):
     serializer_class = ProductMonthSer
     queryset = Product.objects.all()
+
+    def get_serializer_context(self):
+        year = self.request.GET.get("year", None)
+        return {"year": year}
 
 
 class ProductDepotMonthView(ListAPIView):
@@ -40,3 +52,9 @@ class ProductDepotMonthView(ListAPIView):
 class ProductTopCustomerMonthView(ListAPIView):
     serializer_class = ProductTopCustomerMonthSer
     queryset = Product.objects.all().prefetch_related("sale_set")
+
+    def get_serializer_context(self):
+        year = self.request.GET.get("year", None)
+        month = self.request.GET.get("month", None)
+
+        return {"year": year, "month": month}
