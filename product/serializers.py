@@ -154,42 +154,35 @@ class ProductDepotMonthSer(ModelSerializer):
             "quantity",
         ]
 
-    def calc(self, obj, quantity=False):
-        years = [year[0] for year in set(obj.sale_set.values_list("date__year"))]
-        # depots = [depot[0] for depot in set(obj.sale_set.values_list("depot__name"))]
-        y = []
-        for year in years:
-            sales = obj.sale_set.filter(date__year=year)
-            if quantity:
-                totals = (
-                    sales.values("date__month", "depot__name")
-                    .annotate(sum=Sum("vol_obs"))
-                    .values("date__month", "depot__name", "sum")
-                )
-            else:
-                totals = (
-                    sales.values("date__month", "depot__name")
-                    .annotate(
-                        sum=Sum(
-                            F("selling_price") * F("vol_obs"), output_field=FloatField()
-                        )
-                    )
-                    .values("date__month", "depot__name", "sum")
-                )
+    def calc(self, obj, quantity, year):
 
-            y.append(
-                {
-                    "year": year,
-                    "months": totals.order_by("date__month").order_by("depot__name"),
-                }
+        sales = obj.sale_set.filter(date__year=year)
+        if quantity:
+            totals = (
+                sales.values("date__month", "depot__name")
+                .annotate(sum=Sum("vol_obs"))
+                .values("date__month", "depot__name", "sum")
             )
-        return y
+        else:
+            totals = (
+                sales.values("date__month", "depot__name")
+                .annotate(
+                    sum=Sum(
+                        F("selling_price") * F("vol_obs"), output_field=FloatField()
+                    )
+                )
+                .values("date__month", "depot__name", "sum")
+            )
+
+        return totals
 
     def get_revenue(self, obj):
-        return self.calc(obj)
+        year = self.context["year"]
+        return self.calc(obj, False, year)
 
     def get_quantity(self, obj):
-        return self.calc(obj, True)
+        year = self.context["year"]
+        return self.calc(obj, True, year)
 
 
 class ProductTopCustomerMonthSer(ModelSerializer):

@@ -48,6 +48,10 @@ class ProductDepotMonthView(ListAPIView):
     serializer_class = ProductDepotMonthSer
     queryset = Product.objects.all()
 
+    def get_serializer_context(self):
+        year = self.request.GET.get("year", None)
+        return {"year": year}
+
 
 class ProductTopCustomerMonthView(ListAPIView):
     serializer_class = ProductTopCustomerMonthSer

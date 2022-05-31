@@ -81,43 +81,41 @@ class DepotProductMonthSer(ModelSerializer):
             "quantity",
         ]
 
-    def calc(self, obj, quantity=False):
-        years = [year[0] for year in set(obj.sale_set.values_list("date__year"))]
+    def calc(self, obj, quantity, year):
         products = Product.objects.all()
-        y = []
-        for year in years:
-            sales = obj.sale_set.filter(date__year=year)
-            prods = []
-            for product in products:
-                if quantity:
-                    totals = (
-                        sales.filter(product=product)
-                        .values("date__year", "date__month")
-                        .annotate(sum=Sum("vol_obs"))
-                        .values("date__month", "sum")
-                    )
-                else:
-                    totals = (
-                        sales.filter(product=product)
-                        .values("date__year", "date__month")
-                        .annotate(
-                            sum=Sum(
-                                F("selling_price") * F("vol_obs"),
-                                output_field=FloatField(),
-                            )
+        sales = obj.sale_set.filter(date__year=year)
+        prods = []
+        for product in products:
+            if quantity:
+                totals = (
+                    sales.filter(product=product)
+                    .values("date__year", "date__month")
+                    .annotate(sum=Sum("vol_obs"))
+                    .values("date__month", "sum")
+                )
+            else:
+                totals = (
+                    sales.filter(product=product)
+                    .values("date__year", "date__month")
+                    .annotate(
+                        sum=Sum(
+                            F("selling_price") * F("vol_obs"),
+                            output_field=FloatField(),
                         )
-                        .values("date__month", "sum")
                     )
-                prods.append({"name": product.name, "months": totals})
+                    .values("date__month", "sum")
+                )
+            prods.append({"name": product.name, "months": totals})
 
-            y.append({"year": year, "products": prods})
-        return y
+        return prods
 
     def get_revenue(self, obj):
-        return self.calc(obj)
+        year = self.context["year"]
+        return self.calc(obj, False, year)
 
     def get_quantity(self, obj):
-        return self.calc(obj, True)
+        year = self.context["year"]
+        return self.calc(obj, True, year)
 
 
 class DepotSeriesSer(ModelSerializer):
@@ -133,9 +131,13 @@ class DepotSeriesSer(ModelSerializer):
             "quantity",
         ]
 
-    def calc(self, obj, quantity=False):
+    def calc(self, obj, quantity, start_date=None, end_date=None):
 
-        sales = obj.sale_set.all()
+        if start_date and end_date:
+            sales = obj.sale_set.filter(date__gte=start_date).filter(date__lte=end_date)
+        else:
+            sales = obj.sale_set.all()
+
         if quantity:
             totals = sales.values("date").annotate(sum=Sum("vol_obs"))
         else:
@@ -158,9 +160,17 @@ class DepotSeriesSer(ModelSerializer):
         return t
 
     def get_revenue(self, obj):
-        return self.calc(obj)
+        start_date = self.context["start_date"]
+        end_date = self.context["end_date"]
+        if start_date and end_date:
+            return self.calc(obj, False, start_date, end_date)
+        return self.calc(obj, False)
 
     def get_quantity(self, obj):
+        start_date = self.context["start_date"]
+        end_date = self.context["end_date"]
+        if start_date and end_date:
+            return self.calc(obj, True, start_date, end_date)
         return self.calc(obj, True)
 
 
@@ -177,13 +187,20 @@ class DepotProductSeriesSer(ModelSerializer):
             "quantity",
         ]
 
-    def calc(self, obj, quantity=False):
+    def calc(self, obj, quantity, start_date, end_date):
         products = [
             product[0] for product in set(obj.sale_set.values_list("product__name"))
         ]
         prods = []
         for product in products:
-            sales = obj.sale_set.filter(product__name=product)
+            if start_date and end_date:
+                sales = (
+                    obj.sale_set.filter(product__name=product)
+                    .filter(date__gte=start_date)
+                    .filter(date__lte=end_date)
+                )
+            else:
+                sales = obj.sale_set.filter(product__name=product)
             if quantity:
                 totals = sales.values("date").annotate(sum=Sum("vol_obs"))
             else:
@@ -209,9 +226,17 @@ class DepotProductSeriesSer(ModelSerializer):
         return prods
 
     def get_revenue(self, obj):
-        return self.calc(obj)
+        start_date = self.context["start_date"]
+        end_date = self.context["end_date"]
+        if start_date and end_date:
+            return self.calc(obj, False, start_date, end_date)
+        return self.calc(obj, False)
 
     def get_quantity(self, obj):
+        start_date = self.context["start_date"]
+        end_date = self.context["end_date"]
+        if start_date and end_date:
+            return self.calc(obj, True, start_date, end_date)
         return self.calc(obj, True)
 
 
@@ -228,25 +253,39 @@ class DepotCustomerMonthSer(ModelSerializer):
             "quantity",
         ]
 
-    def calc(self, obj, quantity=False):
-        years = [year[0] for year in set(obj.sale_set.values_list("date__year"))]
-        y = []
-        for year in years:
-            sales = obj.sale_set.filter(date__year=year)
-            if quantity:
-                annual_totals = (
-                    sales.values("customer__name")
-                    .annotate(sum=Sum("vol_obs"), count=Count("id"))
-                    .values("customer__name", "sum", "count")
-                )
+    def calc(self, obj, quantity, year, month):
 
+        sales = obj.sale_set.filter(date__year=year)
+        if quantity:
+            if month != 13:
                 totals = (
-                    sales.values("customer__name", "date__month")
+                    sales.filter(date__month=month)
+                    .values("customer__name", "date__month")
                     .annotate(sum=Sum("vol_obs"), count=Count("id"))
                     .values("customer__name", "date__month", "sum", "count")
                 )
             else:
-                annual_totals = (
+                totals = (
+                    sales.values("customer__name")
+                    .annotate(sum=Sum("vol_obs"), count=Count("id"))
+                    .values("customer__name", "sum", "count")
+                )
+
+        else:
+            if month != 13:
+                totals = (
+                    sales.filter(date__month=month)
+                    .values("customer__name", "date__month")
+                    .annotate(
+                        sum=Sum(
+                            F("selling_price") * F("vol_obs"), output_field=FloatField()
+                        ),
+                        count=Count("id"),
+                    )
+                    .values("customer__name", "date__month", "sum", "count")
+                )
+            else:
+                totals = (
                     sales.values("customer__name")
                     .annotate(
                         sum=Sum(
@@ -256,27 +295,17 @@ class DepotCustomerMonthSer(ModelSerializer):
                     )
                     .values("customer__name", "sum", "count")
                 )
-                totals = (
-                    sales.values("customer__name", "date__month")
-                    .annotate(
-                        sum=Sum(
-                            F("selling_price") * F("vol_obs"), output_field=FloatField()
-                        ),
-                        count=Count("id"),
-                    )
-                    .values("customer__name", "date__month", "sum", "count")
-                )
-            totals = totals.order_by("-sum")
-            annual_totals = annual_totals.order_by("-sum")
-            months = []
-            for month in range(1, 13):
-                customer_month = totals.filter(date__month=month)
-                months.append({"month": month, "customers": customer_month})
-            y.append({"year": year, "months": months, "customers": annual_totals})
-        return y
+
+        totals = totals.order_by("-sum")
+
+        return totals
 
     def get_revenue(self, obj):
-        return self.calc(obj)
+        year = self.context["year"]
+        month = self.context["month"]
+        return self.calc(obj, False, year, month)
 
     def get_quantity(self, obj):
-        return self.calc(obj, True)
+        year = self.context["year"]
+        month = self.context["month"]
+        return self.calc(obj, True, year, month)
