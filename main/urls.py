@@ -1,9 +1,9 @@
-from django.urls import re_path
+from django.urls import path
 from .views import (
     FrontendAppView,
 )
 
 app_name = "main"
 urlpatterns = [
-    re_path(r"^$", FrontendAppView.as_view(), name="frontend"),
+    path("", FrontendAppView.as_view(), name="frontend"),
 ]

@@ -6,6 +6,7 @@ from .views import (
     DepotSeriesView,
     DepotProductSeriesView,
     DepotCustomerMonthView,
+    download,
 )
 
 app_name = "depot"
@@ -21,4 +22,5 @@ urlpatterns = [
         name="product_series",
     ),
     path("customer/<int:pk>/", DepotCustomerMonthView.as_view(), name="depot_customer"),
+    path("download/<int:depot_id>/", download, name="download_template"),
 ]

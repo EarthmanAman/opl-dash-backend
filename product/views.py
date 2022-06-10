@@ -30,9 +30,9 @@ class ProductSeriesView(ListAPIView):
         start_date = self.request.GET.get("start_date", None)
         end_date = self.request.GET.get("end_date", None)
         if start_date and end_date:
-            start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
+            start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
             end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
-        return {"start_date": start_date, "end_date": end_date}
+        return {"start_date": start_date.date(), "end_date": end_date}
 
 
 class ProductMonthView(ListAPIView):

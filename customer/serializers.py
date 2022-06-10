@@ -24,13 +24,14 @@ class RetrieveCustomerSer(ModelSerializer):
         RetrieveSaleSer -> sales.serializers
     """
 
+    trucks = SerializerMethodField()
+
     class Meta:
         model = Customer
-        fields = [
-            "id",
-            "code",
-            "name",
-        ]
+        fields = ["id", "code", "name", "trucks"]
+
+    def get_trucks(self, obj):
+        return RetrieveTruckSer(obj.truck_set.all(), many=True).data
 
 
 # Drivers Serializers

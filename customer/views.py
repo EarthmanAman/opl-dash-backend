@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 # Local imports
 from .models import Customer, Driver, Truck
-
+from depot.models import Depot, DepotCustomer
 from .serializers import (
     # Create serializers
     CreateCustomerSer,
@@ -32,8 +32,9 @@ class CreateCustomerView(ListCreateAPIView):
         serializer = CreateCustomerSer(data=request.data)
 
         if serializer.is_valid():
-            sale = serializer.save()
-            serializer = RetrieveCustomerSer(sale)
+            customer = serializer.save()
+            customers = Customer.objects.all()
+            serializer = RetrieveCustomerSer(customers, many=True)
             return Response(serializer.data)
         else:
             print(serializer.errors)
@@ -50,10 +51,64 @@ class CreateDriverView(ListCreateAPIView):
     queryset = Driver.objects.all()
 
 
+# Add customer
+class AddCustomer(ListCreateAPIView):
+    serializer_class = CreateTruckSer
+
+    def post(self, request, *args, **kwargs):
+
+        customer = request.data.get("customer")
+        depot = request.data.get("depot")
+
+        if customer and depot:
+            customer = Customer.objects.get(pk=int(customer))
+            depot = Depot.objects.get(pk=int(depot))
+            depots_customers = depot.depotcustomer_set.filter(customer=customer)
+            if not depots_customers.exists():
+                depot_customer = DepotCustomer.objects.create(
+                    depot=depot, customer=customer
+                )
+            return Response({"status": "success"})
+        else:
+            return Response({"status": "fail"})
+
+
 # Driver Views
 class CreateTruckView(ListCreateAPIView):
     serializer_class = CreateTruckSer
     queryset = Truck.objects.all()
+
+    def post(self, request, *args, **kwargs):
+
+        first_name = request.data.get("first_name")
+        last_name = request.data.get("last_name")
+        customer = request.data.get("customer")
+        plate_no = request.data.get("plate_no")
+
+        if first_name and last_name:
+            driver = Driver.objects.create(first_name=first_name, last_name=last_name)
+            if customer:
+                customer = Customer.objects.get(pk=int(customer))
+                truck = Truck.objects.create(
+                    customer=customer, driver=driver, plate_no=plate_no
+                )
+            else:
+                customer = Customer.objects.get(name="ONE PET")
+                truck = Truck.objects.create(
+                    customer=customer, plate_no=plate_no, is_hired=True
+                )
+            customers = (
+                Customer.objects.all().order_by("name").prefetch_related("sale_set")
+            )
+            serializer = RetrieveCustomerSer(customers, many=True)
+            return Response(serializer.data)
+        else:
+            Response(
+                {
+                    "status": "failed",
+                    "message": "Something went wrong check your inputs or contact admin",
+                }
+            )
 
 
 class TopCustomerMonthView(RetrieveAPIView):

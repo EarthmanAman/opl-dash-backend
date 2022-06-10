@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.urls import path, include
+from main.views import FrontendAppView
 
+handler404 = FrontendAppView.as_view()
+handler500 = FrontendAppView.as_view()
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("accounts.urls", namespace="accounts")),
