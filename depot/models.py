@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.cache import cache
 
 from customer.models import Customer
 
@@ -8,6 +9,11 @@ class Depot(models.Model):
 
     # Attributes
     name = models.CharField(max_length=50)
+
+    def save(self, *args, **kwargs):
+        super(Customer, self).save(*args, **kwargs)
+        cache.delete("depot")
+        # cache.delete("customer-{}".format(self.pk))
 
     def __str__(self) -> str:
         return self.name

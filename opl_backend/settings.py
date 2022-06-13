@@ -126,6 +126,15 @@ TEMPLATES = [
 #     "depot.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
 #     "product.*": {"ops": {"all", "get", "fetch"}, "timeout": 60 * 60},
 # }
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "cache_table",
+        "TIMEOUT": 604800,  # 7 days
+    }
+}
+
 # SILK SETTINGS
 SILKY_PYTHON_PROFILER = True
 

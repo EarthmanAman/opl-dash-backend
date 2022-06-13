@@ -1,10 +1,16 @@
 from django.db import models
+from django.core.cache import cache
 
 
 class Customer(models.Model):
     # Attributes
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=50)
+
+    def save(self, *args, **kwargs):
+        super(Customer, self).save(*args, **kwargs)
+        cache.delete("customer")
+        cache.delete("customer-{}".format(self.pk))
 
     def __str__(self) -> str:
         return self.code + " : " + self.name

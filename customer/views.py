@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from rest_framework.response import Response
 
@@ -24,17 +25,28 @@ class CreateCustomerView(ListCreateAPIView):
     queryset = Customer.objects.all()
 
     def get(self, request, *args, **kwargs):
-        entries = Customer.objects.all().order_by("name").prefetch_related("sale_set")
-        serializer = RetrieveCustomerSer(entries, many=True)
-        return Response(serializer.data)
+        e = cache.get("customer", None)
+        if e:
+            return Response(e)
+        else:
+            entries = (
+                Customer.objects.all().order_by("name").prefetch_related("truck_set")
+            )
+            serializer = RetrieveCustomerSer(entries, many=True)
+            cache.set("customer", serializer.data)
+            return Response(serializer.data)
 
     def post(self, request, *args, **kwargs):
         serializer = CreateCustomerSer(data=request.data)
 
         if serializer.is_valid():
             customer = serializer.save()
-            customers = Customer.objects.all()
+
+            customers = (
+                Customer.objects.all().order_by("name").prefetch_related("truck_set")
+            )
             serializer = RetrieveCustomerSer(customers, many=True)
+            cache.set("customer", serializer.data)
             return Response(serializer.data)
         else:
             print(serializer.errors)
@@ -43,6 +55,16 @@ class CreateCustomerView(ListCreateAPIView):
 class CustomerDetailView(RetrieveAPIView):
     serializer_class = CustomerMonthSer
     queryset = Customer.objects.all().prefetch_related("sale_set")
+
+    def get(self, request, *args, **kwargs):
+        e = cache.get("customer-{}".format(self.kwargs["pk"]), None)
+        if e:
+            return Response(e)
+        else:
+            customer = Customer.objects.get(pk=int(self.kwargs["pk"]))
+            serializer = CustomerMonthSer(customer)
+            cache.set("customer-{}".format(self.kwargs["pk"]), serializer.data)
+            return Response(serializer.data)
 
 
 # Driver Views
@@ -120,3 +142,21 @@ class TopCustomerMonthView(RetrieveAPIView):
         month = self.request.GET.get("month", None)
 
         return {"year": year, "month": month}
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_serializer_context()
+        e = cache.get(
+            "top-customer-{}-{}".format(context["year"], context["month"]), None
+        )
+        if e:
+            # cache.delete("top-customer")
+            return Response(e)
+        else:
+            user = User.objects.get(pk=int(self.kwargs["pk"]))
+
+            serializer = TopCustomerMonthSer(user, context=context)
+            cache.set(
+                "top-customer-{}-{}".format(context["year"], context["month"]),
+                serializer.data,
+            )
+            return Response(serializer.data)

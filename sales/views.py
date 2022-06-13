@@ -188,7 +188,7 @@ def upload(row, depot, save):
             selling_price=selling_price,
             is_paid=is_paid,
         )
-        print("worked")
+
     else:
         sale = Sale(
             product=product,

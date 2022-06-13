@@ -31,7 +31,7 @@ class RetrieveCustomerSer(ModelSerializer):
         fields = ["id", "code", "name", "trucks"]
 
     def get_trucks(self, obj):
-        return RetrieveTruckSer(obj.truck_set.all(), many=True).data
+        return RetrieveTruckSer(obj.truck_set, many=True).data
 
 
 # Drivers Serializers
@@ -105,8 +105,7 @@ class TopCustomerMonthSer(ModelSerializer):
         ]
 
     def calc(self, quantity, year, month):
-        print(type(month))
-        sales = Sale.objects.filter(date__year=year)
+        sales = Sale.objects.filter(date__year=year).select_related()
         if quantity:
             if month != "False":
                 totals = (
