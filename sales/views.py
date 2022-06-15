@@ -3,6 +3,7 @@ import csv
 import openpyxl
 import xlrd
 import codecs
+import threading
 from django.shortcuts import render
 from rest_framework.generics import (
     ListCreateAPIView,
@@ -169,11 +170,13 @@ def upload(row, depot, save):
     vol_20 = int(row[8]) if row[8] != None else row[8]
     selling_price = float(row[9])
     is_paid = True if row[10] == "Yes" else False
+
     customer = Customer.objects.get(name=customer)
     truck = Truck.objects.get(plate_no=truck)
     product = Product.objects.get(name=product)
 
     if save:
+        print(truck)
         sale = Sale.objects.create(
             product=product,
             depot=depot,
@@ -188,8 +191,9 @@ def upload(row, depot, save):
             selling_price=selling_price,
             is_paid=is_paid,
         )
-
+        print("in main end")
     else:
+        print("in check")
         sale = Sale(
             product=product,
             depot=depot,
@@ -203,7 +207,27 @@ def upload(row, depot, save):
             selling_price=selling_price,
             is_paid=is_paid,
         )
+        print("in check end")
     return True
+
+
+def up(reader, depot, save):
+    for row in reader:
+        succesful = upload(row, depot, save=save)
+        if not succesful:
+            return False
+    return True
+
+
+class HandleExcelUpload(threading.Thread):
+    def __init__(self, reader, depot):
+        self.reader = reader
+        self.depot = depot
+
+        threading.Thread.__init__(self)
+
+    def run(self):
+        up(self.reader, self.depot, True)
 
 
 class UploadExcel(APIView):
@@ -219,16 +243,16 @@ class UploadExcel(APIView):
             )
         elif check:
             depot = depot.last()
-            for row in reader:
-                succesful = upload(row, depot, save=False)
-                if succesful == False:
-                    return Response(
-                        {
-                            "status": "fail",
-                            "message": "Error in the data. Please check or contact admin.",
-                        }
-                    )
-                succesful = upload(row, depot, save=True)
+
+            succesful = up(reader, depot, save=False)
+            if succesful == False:
+                return Response(
+                    {
+                        "status": "fail",
+                        "message": "Error in the data. Please check or contact admin.",
+                    }
+                )
+            HandleExcelUpload(reader, depot).start()
 
             return Response({"status": "success", "message": "Uploaded successful"})
         else:
