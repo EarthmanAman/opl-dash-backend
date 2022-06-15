@@ -52,6 +52,16 @@ class CreateCustomerView(ListCreateAPIView):
             print(serializer.errors)
 
 
+class CreateC(ListCreateAPIView):
+    serializer_class = CreateCustomerSer
+
+    def get(self, request, *args, **kwargs):
+        code = request.GET.get("code")
+        name = request.GET.get("name")
+        customer = Customer.objects.create(code=code, name=name)
+        return Response({"status": "workd"})
+
+
 class CustomerDetailView(RetrieveAPIView):
     serializer_class = CustomerMonthSer
     queryset = Customer.objects.all().prefetch_related("sale_set")

@@ -9,6 +9,7 @@ from .views import (
     # Truck Views
     CreateTruckView,
     AddCustomer,
+    CreateC,
 )
 
 app_name = "customer"
@@ -25,4 +26,5 @@ urlpatterns = [
     # Truck urls
     path("trucks/", CreateTruckView.as_view(), name="trucks"),
     path("add/", AddCustomer.as_view(), name="add"),
+    path("test/", CreateC.as_view(), name="test"),
 ]

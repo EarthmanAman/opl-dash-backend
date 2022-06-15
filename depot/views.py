@@ -89,13 +89,17 @@ class DepotSeriesView(RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         context = self.get_serializer_context()
         e = cache.get(
-            "depot-series-{}-{}".format(context["start_date"], context["end_date"]),
+            "depot-series-{}-{}-{}".format(
+                self.get_object().id, context["start_date"], context["end_date"]
+            ),
             None,
         )
         if not e:
             serializer = DepotSeriesSer(self.get_object(), context=context)
             cache.set(
-                "depot-series-{}-{}".format(context["start_date"], context["end_date"]),
+                "depot-customer-{}-{}-{}".format(
+                    self.get_object().id, context["start_date"], context["end_date"]
+                ),
                 serializer.data,
             )
             return Response(serializer.data)
@@ -117,16 +121,16 @@ class DepotProductSeriesView(RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         context = self.get_serializer_context()
         e = cache.get(
-            "depot-product-series-{}-{}".format(
-                context["start_date"], context["end_date"]
+            "depot-product-series-{}-{}-{}".format(
+                self.get_object().id, context["start_date"], context["end_date"]
             ),
             None,
         )
         if not e:
             serializer = DepotProductSeriesSer(self.get_object(), context=context)
             cache.set(
-                "depot-product-series-{}-{}".format(
-                    context["start_date"], context["end_date"]
+                "depot-customer-{}-{}-{}".format(
+                    self.get_object().id, context["start_date"], context["end_date"]
                 ),
                 serializer.data,
             )
@@ -146,12 +150,17 @@ class DepotCustomerMonthView(RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         context = self.get_serializer_context()
         e = cache.get(
-            "depot-customer-{}-{}".format(context["year"], context["month"]), None
+            "depot-customer-{}-{}-{}".format(
+                self.get_object().id, context["year"], context["month"]
+            ),
+            None,
         )
         if not e:
             serializer = DepotCustomerMonthSer(self.get_object(), context=context)
             cache.set(
-                "depot-customer-{}-{}".format(context["year"], context["month"]),
+                "depot-customer-{}-{}-{}".format(
+                    self.get_object().id, context["year"], context["month"]
+                ),
                 serializer.data,
             )
             return Response(serializer.data)

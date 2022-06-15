@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.cache import cache
 from customer.models import Customer, Truck
 
 from depot.models import Depot
@@ -21,6 +22,10 @@ class Sale(models.Model):
     selling_price   = models.DecimalField(max_digits=12, decimal_places=2)
     vol_obs         = models.FloatField()
     vol_20          = models.FloatField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        super(Customer, self).save(*args, **kwargs)
+        cache.delete("top-customer")
 
     def __str__(self) -> str:
         return self.customer.__str__() + " : " + self.product.__str__() + " : " + self.order_no + " : " + str(self.date)
