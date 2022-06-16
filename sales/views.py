@@ -191,9 +191,7 @@ def upload(row, depot, save):
             selling_price=selling_price,
             is_paid=is_paid,
         )
-        print("in main end")
     else:
-        print("in check")
         sale = Sale(
             product=product,
             depot=depot,
@@ -207,7 +205,6 @@ def upload(row, depot, save):
             selling_price=selling_price,
             is_paid=is_paid,
         )
-        print("in check end")
     return True
 
 
