@@ -24,12 +24,12 @@ class ProductListView(ListAPIView):
     queryset = Product.objects.all()
 
     def get(self, request, *args, **kwargs):
-        e = cache.get("product", None)
-        if not e:
-            serializer = RetrieveProductSer(self.get_queryset(), many=True).data
-            cache.set("product", serializer)
-            return Response(serializer)
-        return Response(e)
+        # e = cache.get("product", None)
+        # if not e:
+        serializer = RetrieveProductSer(self.get_queryset(), many=True).data
+        # cache.set("product", serializer)
+        return Response(serializer)
+        # return Response(e)
 
 
 class ProductSeriesView(ListAPIView):
@@ -45,23 +45,21 @@ class ProductSeriesView(ListAPIView):
         return {"start_date": start_date.date(), "end_date": end_date}
 
     def get(self, request, *args, **kwargs):
-        context = self.get_serializer_context()
-        e = cache.get(
-            "product-series-{}-{}".format(context["start_date"], context["end_date"]),
-            None,
-        )
-        if not e:
-            serializer = ProductSeriesSer(
-                self.get_queryset(), many=True, context=context
-            )
-            cache.set(
-                "product-series-{}-{}".format(
-                    context["start_date"], context["end_date"]
-                ),
-                serializer.data,
-            )
-            return Response(serializer.data)
-        return Response(e)
+        # context = self.get_serializer_context()
+        # e = cache.get(
+        #     "product-series-{}-{}".format(context["start_date"], context["end_date"]),
+        #     None,
+        # )
+        # if not e:
+        serializer = ProductSeriesSer(self.get_queryset(), many=True, context=context)
+        # cache.set(
+        #     "product-series-{}-{}".format(
+        #         context["start_date"], context["end_date"]
+        #     ),
+        #     serializer.data,
+        # )
+        return Response(serializer.data)
+        # return Response(e)
 
 
 class ProductMonthView(ListAPIView):
@@ -73,15 +71,13 @@ class ProductMonthView(ListAPIView):
         return {"year": year}
 
     def get(self, request, *args, **kwargs):
-        context = self.get_serializer_context()
-        e = cache.get("product-month-{}".format(context["year"]), None)
-        if not e:
-            serializer = ProductMonthSer(
-                self.get_queryset(), many=True, context=context
-            )
-            cache.set("product-month-{}".format(context["year"]), serializer.data)
-            return Response(serializer.data)
-        return Response(e)
+        # context = self.get_serializer_context()
+        # e = cache.get("product-month-{}".format(context["year"]), None)
+        # if not e:
+        serializer = ProductMonthSer(self.get_queryset(), many=True, context=context)
+        # cache.set("product-month-{}".format(context["year"]), serializer.data)
+        return Response(serializer.data)
+        # return Response(e)
 
 
 class ProductDepotMonthView(ListAPIView):
@@ -94,14 +90,14 @@ class ProductDepotMonthView(ListAPIView):
 
     def get(self, request, *args, **kwargs):
         context = self.get_serializer_context()
-        e = cache.get("product-depot-month-{}".format(context["year"]))
-        if not e:
-            serializer = ProductDepotMonthSer(
-                self.get_queryset(), many=True, context=context
-            )
-            cache.set("product-depot-month-{}".format(context["year"]), serializer.data)
-            return Response(serializer.data)
-        return Response(e)
+        # e = cache.get("product-depot-month-{}".format(context["year"]))
+        # if not e:
+        serializer = ProductDepotMonthSer(
+            self.get_queryset(), many=True, context=context
+        )
+        # cache.set("product-depot-month-{}".format(context["year"]), serializer.data)
+        return Response(serializer.data)
+        # return Response(e)
 
 
 class ProductTopCustomerMonthView(ListAPIView):
@@ -116,16 +112,16 @@ class ProductTopCustomerMonthView(ListAPIView):
 
     def get(self, request, *args, **kwargs):
         context = self.get_serializer_context()
-        e = cache.get(
-            "product-top-customer-{}-{}".format(context["year"], context["month"]), None
+        # e = cache.get(
+        #     "product-top-customer-{}-{}".format(context["year"], context["month"]), None
+        # )
+        # if not e:
+        serializer = ProductTopCustomerMonthSer(
+            self.get_queryset(), many=True, context=context
         )
-        if not e:
-            serializer = ProductTopCustomerMonthSer(
-                self.get_queryset(), many=True, context=context
-            )
-            cache.set(
-                "product-top-customer-{}-{}".format(context["year"], context["month"]),
-                serializer.data,
-            )
-            return Response(serializer.data)
-        return Response(e)
+        # cache.set(
+        #     "product-top-customer-{}-{}".format(context["year"], context["month"]),
+        #     serializer.data,
+        # )
+        return Response(serializer.data)
+        # return Response(e)

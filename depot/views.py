@@ -33,7 +33,7 @@ class DepotListView(ListAPIView):
     #     return super(DepotListView, self).dispatch(*args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        cache.clear()
+        # cache.clear()
         # if not e:
         #     depots = Depot.objects.all()
         #     serializer = RetrieveDepotSer(depots, many=True)
@@ -56,12 +56,12 @@ class DepotMonthView(ListAPIView):
 
     def get(self, request, *args, **kwargs):
         context = self.get_serializer_context()
-        e = cache.get("depot-month-{}".format(context["year"]), None)
-        if not e:
-            serializer = DepotMonthSer(self.get_queryset(), many=True, context=context)
-            cache.set("depot-month-{}".format(context["year"]), serializer.data)
-            return Response(serializer.data)
-        return Response(e)
+        # e = cache.get("depot-month-{}".format(context["year"]), None)
+        # if not e:
+        serializer = DepotMonthSer(self.get_queryset(), many=True, context=context)
+        # cache.set("depot-month-{}".format(context["year"]), serializer.data)
+        return Response(serializer.data)
+        # return Response(e)
 
 
 class DepotProductMonthView(ListAPIView):
@@ -98,22 +98,22 @@ class DepotSeriesView(RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         context = self.get_serializer_context()
-        e = cache.get(
-            "depot-series-{}-{}-{}".format(
-                self.get_object().id, context["start_date"], context["end_date"]
-            ),
-            None,
-        )
-        if not e:
-            serializer = DepotSeriesSer(self.get_object(), context=context)
-            cache.set(
-                "depot-customer-{}-{}-{}".format(
-                    self.get_object().id, context["start_date"], context["end_date"]
-                ),
-                serializer.data,
-            )
-            return Response(serializer.data)
-        return Response(e)
+        # e = cache.get(
+        #     "depot-series-{}-{}-{}".format(
+        #         self.get_object().id, context["start_date"], context["end_date"]
+        #     ),
+        #     None,
+        # )
+        # if not e:
+        serializer = DepotSeriesSer(self.get_object(), context=context)
+        # cache.set(
+        #     "depot-customer-{}-{}-{}".format(
+        #         self.get_object().id, context["start_date"], context["end_date"]
+        #     ),
+        #     serializer.data,
+        # )
+        return Response(serializer.data)
+        # return Response(e)
 
 
 class DepotProductSeriesView(RetrieveAPIView):
@@ -130,22 +130,22 @@ class DepotProductSeriesView(RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         context = self.get_serializer_context()
-        e = cache.get(
-            "depot-product-series-{}-{}-{}".format(
-                self.get_object().id, context["start_date"], context["end_date"]
-            ),
-            None,
-        )
-        if not e:
-            serializer = DepotProductSeriesSer(self.get_object(), context=context)
-            cache.set(
-                "depot-customer-{}-{}-{}".format(
-                    self.get_object().id, context["start_date"], context["end_date"]
-                ),
-                serializer.data,
-            )
-            return Response(serializer.data)
-        return Response(e)
+        # e = cache.get(
+        #     "depot-product-series-{}-{}-{}".format(
+        #         self.get_object().id, context["start_date"], context["end_date"]
+        #     ),
+        #     None,
+        # )
+        # if not e:
+        serializer = DepotProductSeriesSer(self.get_object(), context=context)
+        # cache.set(
+        #     "depot-customer-{}-{}-{}".format(
+        #         self.get_object().id, context["start_date"], context["end_date"]
+        #     ),
+        #     serializer.data,
+        # )
+        return Response(serializer.data)
+        # return Response(e)
 
 
 class DepotCustomerMonthView(RetrieveAPIView):
@@ -159,22 +159,22 @@ class DepotCustomerMonthView(RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         context = self.get_serializer_context()
-        e = cache.get(
-            "depot-customer-{}-{}-{}".format(
-                self.get_object().id, context["year"], context["month"]
-            ),
-            None,
-        )
-        if not e:
-            serializer = DepotCustomerMonthSer(self.get_object(), context=context)
-            cache.set(
-                "depot-customer-{}-{}-{}".format(
-                    self.get_object().id, context["year"], context["month"]
-                ),
-                serializer.data,
-            )
-            return Response(serializer.data)
-        return Response(e)
+        # e = cache.get(
+        #     "depot-customer-{}-{}-{}".format(
+        #         self.get_object().id, context["year"], context["month"]
+        #     ),
+        #     None,
+        # )
+        # if not e:
+        serializer = DepotCustomerMonthSer(self.get_object(), context=context)
+        # cache.set(
+        #     "depot-customer-{}-{}-{}".format(
+        #         self.get_object().id, context["year"], context["month"]
+        #     ),
+        #     serializer.data,
+        # )
+        return Response(serializer.data)
+        # return Response(e)
 
 
 def customers_formula(depot):

@@ -67,14 +67,14 @@ class CustomerDetailView(RetrieveAPIView):
     queryset = Customer.objects.all().prefetch_related("sale_set")
 
     def get(self, request, *args, **kwargs):
-        e = cache.get("customer-{}".format(self.kwargs["pk"]), None)
-        if e:
-            return Response(e)
-        else:
-            customer = Customer.objects.get(pk=int(self.kwargs["pk"]))
-            serializer = CustomerMonthSer(customer)
-            cache.set("customer-{}".format(self.kwargs["pk"]), serializer.data)
-            return Response(serializer.data)
+        # e = cache.get("customer-{}".format(self.kwargs["pk"]), None)
+        # if e:
+        #     return Response(e)
+        # else:
+        customer = Customer.objects.get(pk=int(self.kwargs["pk"]))
+        serializer = CustomerMonthSer(customer)
+        # cache.set("customer-{}".format(self.kwargs["pk"]), serializer.data)
+        return Response(serializer.data)
 
 
 # Driver Views
@@ -155,18 +155,18 @@ class TopCustomerMonthView(RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         context = self.get_serializer_context()
-        e = cache.get(
-            "top-customer-{}-{}".format(context["year"], context["month"]), None
-        )
-        if e:
-            # cache.delete("top-customer")
-            return Response(e)
-        else:
-            user = User.objects.get(pk=int(self.kwargs["pk"]))
+        # e = cache.get(
+        #     "top-customer-{}-{}".format(context["year"], context["month"]), None
+        # )
+        # if e:
+        #     # cache.delete("top-customer")
+        #     return Response(e)
+        # else:
+        user = User.objects.get(pk=int(self.kwargs["pk"]))
 
-            serializer = TopCustomerMonthSer(user, context=context)
-            cache.set(
-                "top-customer-{}-{}".format(context["year"], context["month"]),
-                serializer.data,
-            )
-            return Response(serializer.data)
+        serializer = TopCustomerMonthSer(user, context=context)
+        # cache.set(
+        #     "top-customer-{}-{}".format(context["year"], context["month"]),
+        #     serializer.data,
+        # )
+        return Response(serializer.data)
