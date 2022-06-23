@@ -45,7 +45,7 @@ class ProductSeriesView(ListAPIView):
         return {"start_date": start_date.date(), "end_date": end_date}
 
     def get(self, request, *args, **kwargs):
-        # context = self.get_serializer_context()
+        context = self.get_serializer_context()
         # e = cache.get(
         #     "product-series-{}-{}".format(context["start_date"], context["end_date"]),
         #     None,
@@ -71,7 +71,7 @@ class ProductMonthView(ListAPIView):
         return {"year": year}
 
     def get(self, request, *args, **kwargs):
-        # context = self.get_serializer_context()
+        context = self.get_serializer_context()
         # e = cache.get("product-month-{}".format(context["year"]), None)
         # if not e:
         serializer = ProductMonthSer(self.get_queryset(), many=True, context=context)
