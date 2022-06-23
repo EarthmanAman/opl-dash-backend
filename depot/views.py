@@ -33,7 +33,7 @@ class DepotListView(ListAPIView):
     #     return super(DepotListView, self).dispatch(*args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        # cache.clear()
+        cache.clear()
         # if not e:
         #     depots = Depot.objects.all()
         #     serializer = RetrieveDepotSer(depots, many=True)
