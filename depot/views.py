@@ -1,6 +1,9 @@
 import datetime
 from django.http import HttpResponse
 from django.core.cache import cache
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from openpyxl import Workbook
@@ -25,14 +28,22 @@ class DepotListView(ListAPIView):
     serializer_class = RetrieveDepotSer
     queryset = Depot.objects.all()
 
+    # @method_decorator(cache_page(2592000, key_prefix="depot"))
+    # def dispatch(self, *args, **kwargs):
+    #     return super(DepotListView, self).dispatch(*args, **kwargs)
+
     def get(self, request, *args, **kwargs):
-        e = cache.get("depot", None)
-        if not e:
-            depots = Depot.objects.all()
-            serializer = RetrieveDepotSer(depots, many=True)
-            cache.set("depot", serializer.data)
-            return Response(serializer.data)
-        return Response(e)
+        # cache.clear()
+        # if not e:
+        #     depots = Depot.objects.all()
+        #     serializer = RetrieveDepotSer(depots, many=True)
+        #     cache.set("depot", serializer.data)
+        #     return Response(serializer.data)
+        depots = Depot.objects.all()
+        serializer = RetrieveDepotSer(depots, many=True)
+        # cache.set("depot", serializer.data)
+        return Response(serializer.data)
+        # return Response(e)
 
 
 class DepotMonthView(ListAPIView):
@@ -47,7 +58,6 @@ class DepotMonthView(ListAPIView):
         context = self.get_serializer_context()
         e = cache.get("depot-month-{}".format(context["year"]), None)
         if not e:
-
             serializer = DepotMonthSer(self.get_queryset(), many=True, context=context)
             cache.set("depot-month-{}".format(context["year"]), serializer.data)
             return Response(serializer.data)

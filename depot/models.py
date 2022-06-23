@@ -11,7 +11,7 @@ class Depot(models.Model):
     name = models.CharField(max_length=50)
 
     def save(self, *args, **kwargs):
-        super(Customer, self).save(*args, **kwargs)
+        super(Depot, self).save(*args, **kwargs)
         cache.delete("depot")
         # cache.delete("customer-{}".format(self.pk))
 
