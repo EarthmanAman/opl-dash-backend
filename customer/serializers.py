@@ -90,7 +90,7 @@ class RetrieveTruckSer(ModelSerializer):
         ]
 
     def get_driver(self, obj):
-        return RetrieveDriverSer(obj.driver).data
+        return f"{obj.driver.first_name} {obj.driver.last_name}"
 
 
 class TopCustomerMonthSer(ModelSerializer):
