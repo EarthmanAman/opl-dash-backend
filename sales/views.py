@@ -69,9 +69,13 @@ class CreateSaleView(ListCreateAPIView):
         serializer = CreateSaleSer(data=request.data)
 
         if serializer.is_valid():
+            print("in post before save")
             sale = serializer.save()
+            print("in post after save")
             start_date = request.GET.get("start_date", None)
             end_date = request.GET.get("end_date", None)
+            print(start_date)
+            print(end_date)
             if start_date != None and end_date != None:
                 start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
                 end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
