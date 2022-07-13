@@ -182,11 +182,18 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-CSRF_TRUSTED_ORIGINS = ["https://opl.azurewebsites.net", "http://opl.azurewebsites.net"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://opl.azurewebsites.net",
+    "http://opl.azurewebsites.net",
+    "https://goldfish-app-2nsjp.ondigitalocean.app",
+    "http://goldfish-app-2nsjp.ondigitalocean.app",
+]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://opl.azurewebsites.net",
     "http://opl.azurewebsites.net",
+    "https://goldfish-app-2nsjp.ondigitalocean.app",
+    "http://goldfish-app-2nsjp.ondigitalocean.app",
 ]
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
