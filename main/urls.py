@@ -9,4 +9,5 @@ urlpatterns = [
     path("depots", FrontendAppView.as_view(), name="depots_redirect"),
     path("sale", FrontendAppView.as_view(), name="sales_redirect"),
     path("customers", FrontendAppView.as_view(), name="customers_redirect"),
+    path("login", FrontendAppView.as_view(), name="login"),
 ]

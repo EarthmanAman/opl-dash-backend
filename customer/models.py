@@ -38,5 +38,9 @@ class Truck(models.Model):
     plate_no = models.CharField(max_length=20)
     is_hired = models.BooleanField(default=False)
 
+    def save(self, *args, **kwargs):
+        super(Truck, self).save(*args, **kwargs)
+        cache.delete("trucks")
+
     def __str__(self) -> str:
         return self.driver.__str__() + " : " + self.plate_no

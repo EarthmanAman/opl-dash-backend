@@ -33,17 +33,19 @@ class DepotListView(ListAPIView):
     #     return super(DepotListView, self).dispatch(*args, **kwargs)
 
     def get(self, request, *args, **kwargs):
+
+        e = cache.get("depots", None)
         # cache.clear()
-        # if not e:
-        #     depots = Depot.objects.all()
-        #     serializer = RetrieveDepotSer(depots, many=True)
-        #     cache.set("depot", serializer.data)
-        #     return Response(serializer.data)
-        depots = Depot.objects.all()
-        serializer = RetrieveDepotSer(depots, many=True)
-        # cache.set("depot", serializer.data)
-        return Response(serializer.data)
-        # return Response(e)
+        if not e:
+            depots = Depot.objects.all()
+            serializer = RetrieveDepotSer(depots, many=True)
+            cache.set("depots", serializer.data)
+            return Response(serializer.data)
+        # depots = Depot.objects.all()
+        # serializer = RetrieveDepotSer(depots, many=True)
+        # # cache.set("depot", serializer.data)
+        # return Response(serializer.data)
+        return Response(e)
 
 
 class DepotMonthView(ListAPIView):

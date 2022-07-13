@@ -14,6 +14,7 @@ from .serializers import (
     CreateDriverSer,
     # Truck Serializers
     CreateTruckSer,
+    RetrieveTruckSer,
     TopCustomerMonthSer,
     CustomerMonthSer,
 )
@@ -110,29 +111,57 @@ class CreateTruckView(ListCreateAPIView):
     serializer_class = CreateTruckSer
     queryset = Truck.objects.all()
 
+    def get(self, request, *args, **kwargs):
+        e = cache.get("trucks", None)
+        if not e:
+            trucks = Truck.objects.filter(customer__name="ONE PET").prefetch_related(
+                "driver"
+            )
+            serializer = RetrieveTruckSer(trucks, many=Truck)
+            cache.set("trucks", serializer.data)
+            return Response(serializer.data)
+        return Response(e)
+
     def post(self, request, *args, **kwargs):
 
         first_name = request.data.get("first_name")
         last_name = request.data.get("last_name")
-        customer = request.data.get("customer")
+        customer_id = request.data.get("customer")
         plate_no = request.data.get("plate_no")
 
         if first_name and last_name:
-            driver = Driver.objects.create(first_name=first_name, last_name=last_name)
-            if customer:
-                customer = Customer.objects.get(pk=int(customer))
-                truck = Truck.objects.create(
-                    customer=customer, driver=driver, plate_no=plate_no
-                )
+
+            if customer_id:
+                customer = Customer.objects.get(pk=int(customer_id))
             else:
                 customer = Customer.objects.get(name="ONE PET")
+            trucks = Truck.objects.filter(plate_no=plate_no)
+            if trucks.exists():
+                truck = trucks.last()
+                driver = truck.driver
+                driver.first_name = first_name
+                driver.last_name = last_name
+                driver.save()
+
+                truck.driver = driver
+                truck.customer = customer
+                truck.plate_no = plate_no
+                truck.save()
+            else:
+                driver = Driver.objects.create(
+                    first_name=first_name, last_name=last_name
+                )
                 truck = Truck.objects.create(
-                    customer=customer, plate_no=plate_no, is_hired=True
+                    customer=customer, plate_no=plate_no, driver=driver
                 )
             customers = (
                 Customer.objects.all().order_by("name").prefetch_related("sale_set")
             )
-            serializer = RetrieveCustomerSer(customers, many=True)
+            serializer = (
+                RetrieveCustomerSer(customers, many=True)
+                if customer_id
+                else RetrieveTruckSer(customer.truck_set, many=True)
+            )
             return Response(serializer.data)
         else:
             Response(

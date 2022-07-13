@@ -50,15 +50,27 @@ class CreateSaleView(ListCreateAPIView):
     def get(self, request, *args, **kwargs):
         start_date = request.GET.get("start_date", None)
         end_date = request.GET.get("end_date", None)
+        depot = request.GET.get("depot", None)
         if start_date != None and end_date != None:
             start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
             end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
-            entries = (
-                Sale.objects.filter(date__gte=start_date)
-                .filter(date__lte=end_date)
-                .order_by("-date")
-                .select_related()
-            )
+            if depot != "staff":
+
+                entries = (
+                    Sale.objects.filter(depot__name=depot)
+                    .filter(date__gte=start_date)
+                    .filter(date__lte=end_date)
+                    .order_by("-date")
+                    .select_related()
+                )
+
+            else:
+                entries = (
+                    Sale.objects.filter(date__gte=start_date)
+                    .filter(date__lte=end_date)
+                    .order_by("-date")
+                    .select_related()
+                )
         else:
             entries = Sale.objects.all().select_related()
 
@@ -72,8 +84,7 @@ class CreateSaleView(ListCreateAPIView):
             sale = serializer.save()
             start_date = request.GET.get("start_date", None)
             end_date = request.GET.get("end_date", None)
-            print(start_date)
-            print(end_date)
+
             if start_date != None and end_date != None:
                 start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
                 end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
