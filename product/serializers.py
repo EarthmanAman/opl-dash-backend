@@ -23,79 +23,43 @@ class RetrieveProductSer(ModelSerializer):
 
 class ProductSeriesSer(ModelSerializer):
     revenue = SerializerMethodField()
-    quantity = SerializerMethodField()
+    # quantity = SerializerMethodField()
 
     class Meta:
         model = Product
         fields = [
             "name",
             "revenue",
-            "quantity",
+            # "quantity",
         ]
 
     def calc(self, obj, quantity=False, start_date=None, end_date=None):
-        if quantity:
-            if start_date and end_date:
-                totals = (
-                    obj.sale_set.filter(date__gte=start_date)
-                    .filter(date__lte=end_date)
-                    .values("date")
-                    .annotate(sum=Sum("vol_obs"))
-                )
-            else:
-                totals = obj.sale_set.values("date").annotate(sum=Sum("vol_obs"))
-        else:
-            if start_date and end_date:
-                totals = (
-                    obj.sale_set.filter(date__gte=start_date)
-                    .filter(date__lte=end_date)
-                    .values("date")
-                    .annotate(
-                        sum=Sum(
-                            F("selling_price") * F("vol_obs"), output_field=FloatField()
-                        )
-                    )
-                )
-            else:
-                totals = obj.sale_set.values("date").annotate(
-                    sum=Sum(
-                        F("selling_price") * F("vol_obs"), output_field=FloatField()
-                    )
-                )
-        t = []
-        for total in totals.order_by("-date"):
-            timestamp = (
-                int(
-                    datetime.datetime.combine(
-                        total["date"], datetime.datetime.min.time()
-                    ).timestamp()
-                )
-                * 1000
+
+        totals = (
+            obj.sale_set.only("date", "selling_price", "vol_obs")
+            .filter(date__gte=start_date)
+            .filter(date__lte=end_date)
+            .values("date")
+            .annotate(
+                sum=Sum(F("selling_price") * F("vol_obs"), output_field=FloatField()),
+                quantity=Sum("vol_obs"),
             )
-            t.append(
-                {
-                    "date": total["date"],
-                    "timestamp": timestamp,
-                    "sum": total["sum"],
-                }
-            )
-        return t
+        )
+
+        return totals
 
     def get_revenue(self, obj):
         start_date = self.context["start_date"]
         end_date = self.context["end_date"]
-        if start_date and end_date:
+        return self.calc(obj, False, start_date, end_date)
 
-            return self.calc(obj, False, start_date, end_date)
-        return self.calc(obj, False)
+    # def get_quantity(self, obj):
+    #     start_date = self.context["start_date"]
+    #     end_date = self.context["end_date"]
+    #     if start_date and end_date:
+    #         return self.calc(obj, True, start_date, end_date)
 
-    def get_quantity(self, obj):
-        start_date = self.context["start_date"]
-        end_date = self.context["end_date"]
-        if start_date and end_date:
-            return self.calc(obj, True, start_date, end_date)
-
-        return self.calc(obj, True)
+    #     return self.calc(obj, True)
 
 
 class ProductMonthSer(ModelSerializer):

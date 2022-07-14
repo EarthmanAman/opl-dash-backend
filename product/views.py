@@ -34,7 +34,7 @@ class ProductListView(ListAPIView):
 
 class ProductSeriesView(ListAPIView):
     serializer_class = ProductSeriesSer
-    queryset = Product.objects.prefetch_related("sale_set").all()
+    queryset = Product.objects.all()
 
     def get_serializer_context(self):
         start_date = self.request.GET.get("start_date", None)

@@ -131,7 +131,7 @@ class DepotSeriesSer(ModelSerializer):
             # "quantity",
         ]
 
-    def calc(self, obj, quantity, start_date=None, end_date=None):
+    def calc(self, obj, start_date=None, end_date=None):
 
         if start_date and end_date:
             sales = (
@@ -173,7 +173,7 @@ class DepotSeriesSer(ModelSerializer):
         start_date = self.context["start_date"]
         end_date = self.context["end_date"]
         if start_date and end_date:
-            return self.calc(obj, False, start_date, end_date)
+            return self.calc(obj, start_date, end_date)
         return self.calc(obj, False)
 
     # def get_quantity(self, obj):
