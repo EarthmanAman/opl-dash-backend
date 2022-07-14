@@ -57,23 +57,24 @@ class CreateSaleView(ListCreateAPIView):
             if depot != "staff":
 
                 entries = (
-                    Sale.objects.filter(depot__name=depot)
+                    Sale.objects.select_related("depot", "customer", "truck", "product")
+                    .filter(depot__name=depot)
                     .filter(date__gte=start_date)
                     .filter(date__lte=end_date)
                     .order_by("-date")
-                    .select_related()
                 )
 
             else:
                 entries = (
-                    Sale.objects.filter(date__gte=start_date)
+                    Sale.objects.select_related("depot", "customer", "truck", "product")
+                    .filter(date__gte=start_date)
                     .filter(date__lte=end_date)
                     .order_by("-date")
-                    .select_related()
                 )
         else:
-            entries = Sale.objects.all().select_related()
-
+            entries = Sale.objects.select_related(
+                "depot", "customer", "truck", "product"
+            ).all()
         serializer = RetrieveSaleSer(entries, many=True)
         return Response(serializer.data)
 

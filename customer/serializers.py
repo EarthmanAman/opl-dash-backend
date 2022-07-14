@@ -95,61 +95,35 @@ class RetrieveTruckSer(ModelSerializer):
 
 class TopCustomerMonthSer(ModelSerializer):
     revenue = SerializerMethodField()
-    quantity = SerializerMethodField()
+    # quantity = SerializerMethodField()
 
     class Meta:
         model = User
         fields = [
             "revenue",
-            "quantity",
+            # "quantity",
         ]
 
     def calc(self, quantity, year, month):
-        sales = Sale.objects.filter(date__year=year).select_related()
-        if quantity:
-            if month != "False":
-                totals = (
-                    sales.values("customer__name", "date__month")
-                    .annotate(sum=Sum("vol_obs"))
-                    .values("customer__name", "date__month", "sum")
-                )
-            else:
-                print("in else")
-                totals = (
-                    sales.values("customer__name")
-                    .annotate(sum=Sum("vol_obs"))
-                    .values("customer__name", "sum")
-                )
-
+        sales = Sale.objects.filter(date__year=year).prefetch_related("customer")
+        if month != "False":
+            totals = sales.values("customer__name", "date__month").annotate(
+                sum=Sum(F("selling_price") * F("vol_obs"), output_field=FloatField()),
+                quantity=Sum("vol_obs"),
+            )
         else:
-            if month != "False":
-                totals = (
-                    sales.values("customer__name", "date__month")
-                    .annotate(
-                        sum=Sum(
-                            F("selling_price") * F("vol_obs"), output_field=FloatField()
-                        )
-                    )
-                    .values("customer__name", "date__month", "sum")
-                )
-            else:
-                totals = (
-                    sales.values("customer__name")
-                    .annotate(
-                        sum=Sum(
-                            F("selling_price") * F("vol_obs"), output_field=FloatField()
-                        )
-                    )
-                    .values("customer__name", "sum")
-                )
+            totals = sales.values("customer__name").annotate(
+                sum=Sum(F("selling_price") * F("vol_obs"), output_field=FloatField()),
+                quantity=Sum("vol_obs"),
+            )
 
         totals = totals.order_by("-sum")
-        if month != "False":
-            months = []
-            for month in range(1, 13):
-                customer_month = totals.filter(date__month=month)
-                months.append({"month": month, "customers": customer_month})
-            return months
+        # if month != "False":
+        #     months = []
+        #     for month in range(1, 13):
+        #         customer_month = totals.filter(date__month=month)
+        #         months.append({"month": month, "customers": customer_month})
+        #     return months
         return totals
 
     def get_revenue(self, obj):
@@ -157,10 +131,10 @@ class TopCustomerMonthSer(ModelSerializer):
         month = self.context["month"]
         return self.calc(False, year, month)
 
-    def get_quantity(self, obj):
-        year = self.context["year"]
-        month = self.context["month"]
-        return self.calc(True, year, month)
+    # def get_quantity(self, obj):
+    #     year = self.context["year"]
+    #     month = self.context["month"]
+    #     return self.calc(True, year, month)
 
 
 class CustomerMonthSer(ModelSerializer):

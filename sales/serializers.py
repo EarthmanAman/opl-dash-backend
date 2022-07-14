@@ -1,3 +1,4 @@
+from ast import Str
 from dataclasses import fields
 from itertools import product
 from typing import Dict
@@ -57,16 +58,16 @@ class RetrieveSaleSer(ModelSerializer):
             "vol_20",
         ]
 
-    def get_customer(self, obj) -> Dict:
-        return RetrieveCustomerSer(obj.customer).data
+    def get_customer(self, obj) -> Str:
+        return obj.customer.name
 
-    def get_depot(self, obj) -> Dict:
-        return RetrieveDepotSer(obj.depot).data
+    def get_depot(self, obj) -> Str:
+        return obj.depot.name
 
-    def get_product(self, obj) -> Dict:
-        return RetrieveProductSer(obj.product).data
+    def get_product(self, obj) -> Str:
+        return obj.product.name
 
-    def get_truck(self, obj) -> Dict:
+    def get_truck(self, obj) -> Str:
         if obj.truck == None:
             return {"plate_no": None, "driver": None}
-        return RetrieveTruckSer(obj.truck).data
+        return {"plate_no": obj.truck.plate_no, "driver": obj.truck.driver.first_name}
