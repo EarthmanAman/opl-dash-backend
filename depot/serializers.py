@@ -120,7 +120,7 @@ class DepotProductMonthSer(ModelSerializer):
 
 class DepotSeriesSer(ModelSerializer):
     revenue = SerializerMethodField()
-    quantity = SerializerMethodField()
+    # quantity = SerializerMethodField()
 
     class Meta:
         model = Depot
@@ -128,7 +128,7 @@ class DepotSeriesSer(ModelSerializer):
             "id",
             "name",
             "revenue",
-            "quantity",
+            # "quantity",
         ]
 
     def calc(self, obj, quantity, start_date=None, end_date=None):
@@ -138,12 +138,13 @@ class DepotSeriesSer(ModelSerializer):
         else:
             sales = obj.sale_set.all()
 
-        if quantity:
-            totals = sales.values("date").annotate(sum=Sum("vol_obs"))
-        else:
-            totals = sales.values("date").annotate(
-                sum=Sum(F("selling_price") * F("vol_obs"), output_field=FloatField())
-            )
+        # if quantity:
+        #     totals = sales.values("date").annotate(sum=Sum("vol_obs"))
+        # else:
+        totals = sales.values("date").annotate(
+            sum=Sum(F("selling_price") * F("vol_obs"), output_field=FloatField()),
+            quantity=Sum("vol_obs"),
+        )
         t = []
         for total in totals.order_by("-date"):
             timestamp = (
@@ -155,7 +156,12 @@ class DepotSeriesSer(ModelSerializer):
                 * 1000
             )
             t.append(
-                {"date": total["date"], "timestamp": timestamp, "sum": total["sum"]}
+                {
+                    "date": total["date"],
+                    "timestamp": timestamp,
+                    "sum": total["sum"],
+                    "quantity": total["quantity"],
+                }
             )
         return t
 
@@ -166,12 +172,12 @@ class DepotSeriesSer(ModelSerializer):
             return self.calc(obj, False, start_date, end_date)
         return self.calc(obj, False)
 
-    def get_quantity(self, obj):
-        start_date = self.context["start_date"]
-        end_date = self.context["end_date"]
-        if start_date and end_date:
-            return self.calc(obj, True, start_date, end_date)
-        return self.calc(obj, True)
+    # def get_quantity(self, obj):
+    #     start_date = self.context["start_date"]
+    #     end_date = self.context["end_date"]
+    #     if start_date and end_date:
+    #         return self.calc(obj, True, start_date, end_date)
+    #     return self.calc(obj, True)
 
 
 class DepotProductSeriesSer(ModelSerializer):
