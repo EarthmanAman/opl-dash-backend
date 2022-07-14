@@ -1,8 +1,7 @@
 import datetime
 from django.http import HttpResponse
 from django.core.cache import cache
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
+from django.db.models import Prefetch
 
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView, RetrieveAPIView
@@ -13,7 +12,7 @@ from openpyxl.utils import get_column_letter
 from customer.models import Customer
 from depot.models import Depot
 from product.models import Product
-
+from sales.models import Sale
 from depot.serializers import (
     RetrieveDepotSer,
     DepotMonthSer,
@@ -88,7 +87,7 @@ class DepotProductMonthView(ListAPIView):
 
 class DepotSeriesView(RetrieveAPIView):
     serializer_class = DepotSeriesSer
-    queryset = Depot.objects.prefetch_related("sale_set")
+    queryset = Depot.objects.all()
 
     def get_serializer_context(self):
         start_date = self.request.GET.get("start_date", None)

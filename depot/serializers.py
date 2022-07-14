@@ -134,7 +134,11 @@ class DepotSeriesSer(ModelSerializer):
     def calc(self, obj, quantity, start_date=None, end_date=None):
 
         if start_date and end_date:
-            sales = obj.sale_set.filter(date__gte=start_date).filter(date__lte=end_date)
+            sales = (
+                obj.sale_set.only("date", "selling_price", "vol_obs")
+                .filter(date__gte=start_date)
+                .filter(date__lte=end_date)
+            ).order_by("-date")
         else:
             sales = obj.sale_set.all()
 
@@ -145,25 +149,25 @@ class DepotSeriesSer(ModelSerializer):
             sum=Sum(F("selling_price") * F("vol_obs"), output_field=FloatField()),
             quantity=Sum("vol_obs"),
         )
-        t = []
-        for total in totals.order_by("-date"):
-            timestamp = (
-                int(
-                    datetime.datetime.combine(
-                        total["date"], datetime.datetime.min.time()
-                    ).timestamp()
-                )
-                * 1000
-            )
-            t.append(
-                {
-                    "date": total["date"],
-                    "timestamp": timestamp,
-                    "sum": total["sum"],
-                    "quantity": total["quantity"],
-                }
-            )
-        return t
+        # t = []
+        # for total in totals.order_by("-date"):
+        #     timestamp = (
+        #         int(
+        #             datetime.datetime.combine(
+        #                 total["date"], datetime.datetime.min.time()
+        #             ).timestamp()
+        #         )
+        #         * 1000
+        #     )
+        #     t.append(
+        #         {
+        #             "date": total["date"],
+        #             "timestamp": timestamp,
+        #             "sum": total["sum"],
+        #             "quantity": total["quantity"],
+        #         }
+        #     )
+        return totals
 
     def get_revenue(self, obj):
         start_date = self.context["start_date"]
