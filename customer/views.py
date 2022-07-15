@@ -128,10 +128,10 @@ class CreateTruckView(ListCreateAPIView):
         last_name = request.data.get("last_name")
         customer_id = request.data.get("customer")
         plate_no = request.data.get("plate_no")
-
+        print(customer_id)
         if first_name and last_name:
 
-            if customer_id:
+            if customer_id != None:
                 customer = Customer.objects.get(pk=int(customer_id))
             else:
                 customer = Customer.objects.get(name="ONE PET")
@@ -155,7 +155,7 @@ class CreateTruckView(ListCreateAPIView):
                     customer=customer, plate_no=plate_no, driver=driver
                 )
             customers = (
-                Customer.objects.all().order_by("name").prefetch_related("sale_set")
+                (Customer.objects.prefetch_related("sale_set")).all().order_by("name")
             )
             serializer = (
                 RetrieveCustomerSer(customers, many=True)
