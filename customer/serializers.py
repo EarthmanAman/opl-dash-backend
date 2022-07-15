@@ -4,6 +4,8 @@ from rest_framework.serializers import (
     ModelSerializer,
     SerializerMethodField,
 )
+
+from datetime import date
 from .models import Customer, Driver, Truck
 from sales.models import Sale
 
@@ -139,7 +141,7 @@ class TopCustomerMonthSer(ModelSerializer):
 
 class CustomerMonthSer(ModelSerializer):
     revenue = SerializerMethodField()
-    quantity = SerializerMethodField()
+    # quantity = SerializerMethodField()
 
     class Meta:
         model = Customer
@@ -147,32 +149,19 @@ class CustomerMonthSer(ModelSerializer):
             "id",
             "name",
             "revenue",
-            "quantity",
+            # "quantity",
         ]
 
-    def calc(self, obj, quantity=False):
-        years = [year[0] for year in set(obj.sale_set.values_list("date__year"))]
+    def calc(self, obj):
         y = []
-        for year in years:
+        for year in range(2021, date.today().year + 1):
             sales = obj.sale_set.filter(date__year=year)
-            if quantity:
 
-                totals = (
-                    sales.values("date__month")
-                    .annotate(sum=Sum("vol_obs"), count=Count("id"))
-                    .values("date__month", "sum", "count")
-                )
-            else:
-                totals = (
-                    sales.values("date__month")
-                    .annotate(
-                        sum=Sum(
-                            F("selling_price") * F("vol_obs"), output_field=FloatField()
-                        ),
-                        count=Count("id"),
-                    )
-                    .values("date__month", "sum", "count")
-                )
+            totals = sales.values("date__month").annotate(
+                sum=Sum(F("selling_price") * F("vol_obs"), output_field=FloatField()),
+                count=Count("id"),
+                quantity=Sum("vol_obs"),
+            )
             totals = totals.order_by("-sum")
             months = []
 
@@ -183,5 +172,5 @@ class CustomerMonthSer(ModelSerializer):
     def get_revenue(self, obj):
         return self.calc(obj)
 
-    def get_quantity(self, obj):
-        return self.calc(obj, True)
+    # def get_quantity(self, obj):
+    #     return self.calc(obj, True)
