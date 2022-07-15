@@ -177,6 +177,7 @@ def upload(row, depot, save):
     product = row[1]
     customer = row[2]
     truck = row[3]
+    truck = row[3]
     order_no = row[4]
     lpo_no = row[5]
     entry_no = row[6]

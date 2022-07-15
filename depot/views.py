@@ -210,6 +210,7 @@ def create_excel(depot):
         "PRODUCT",
         "CUSTOMER",
         "TRUCK",
+        "DRIVER",
         "ORDER NO",
         "LPO_NO",
         "ENTRY NO",

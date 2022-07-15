@@ -128,7 +128,7 @@ class CreateTruckView(ListCreateAPIView):
         last_name = request.data.get("last_name")
         customer_id = request.data.get("customer")
         plate_no = request.data.get("plate_no")
-        print(customer_id)
+
         if first_name and last_name:
 
             if customer_id != None:
