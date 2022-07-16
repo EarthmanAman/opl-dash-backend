@@ -19,11 +19,12 @@ class Customer(models.Model):
 class Driver(models.Model):
 
     # Attributes
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
+    name = models.CharField(max_length=100, null=True)
+    # first_name = models.CharField(max_length=50)
+    # last_name = models.CharField(max_length=50)
 
     def __str__(self) -> str:
-        return self.first_name
+        return self.name
 
 
 class Truck(models.Model):
@@ -43,4 +44,4 @@ class Truck(models.Model):
         cache.delete("trucks")
 
     def __str__(self) -> str:
-        return self.driver.__str__() + " : " + self.plate_no
+        return str(self.plate_no)

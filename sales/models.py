@@ -16,6 +16,7 @@ class Sale(models.Model):
     # Atrributes
     entry_no = models.CharField(max_length=50, null=True)
     date = models.DateField()
+    loading_date = models.DateField(blank=True, null=True)
     is_paid = models.BooleanField(default=True)
     is_loaded = models.BooleanField(default=True)
     lpo_no = models.CharField(max_length=50, null=True)
@@ -23,6 +24,12 @@ class Sale(models.Model):
     selling_price = models.DecimalField(max_digits=12, decimal_places=2)
     vol_obs = models.FloatField()
     vol_20 = models.FloatField(null=True, blank=True)
+
+    amount_paid = models.DecimalField(
+        max_digits=12, decimal_places=2, blank=True, null=True
+    )
+    seal_no = models.CharField(max_length=100, null=True)
+    remarks = models.TextField(null=True, blank=True)
 
     def __str__(self) -> str:
         return (

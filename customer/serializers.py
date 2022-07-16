@@ -41,8 +41,7 @@ class CreateDriverSer(ModelSerializer):
     class Meta:
         model = Driver
         fields = [
-            "first_name",
-            "last_name",
+            "name",
         ]
 
 
@@ -57,8 +56,7 @@ class RetrieveDriverSer(ModelSerializer):
         model = Driver
         fields = [
             "id",
-            "first_name",
-            "last_name",
+            "name",
         ]
 
 
@@ -92,7 +90,7 @@ class RetrieveTruckSer(ModelSerializer):
         ]
 
     def get_driver(self, obj):
-        return f"{obj.driver.first_name} {obj.driver.last_name}"
+        return obj.driver.name
 
 
 class TopCustomerMonthSer(ModelSerializer):

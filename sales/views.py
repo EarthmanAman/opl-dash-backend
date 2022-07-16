@@ -13,7 +13,7 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from customer.models import Customer, Truck
+from customer.models import Customer, Driver, Truck
 from depot.models import Depot
 from product.models import Product
 
@@ -80,7 +80,7 @@ class CreateSaleView(ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = CreateSaleSer(data=request.data)
-
+        print(request.data)
         if serializer.is_valid():
             sale = serializer.save()
             start_date = request.GET.get("start_date", None)
@@ -158,13 +158,18 @@ def check_headers(file):
         "PRODUCT",
         "CUSTOMER",
         "TRUCK",
+        "DRIVER",
         "ORDER NO",
         "LPO_NO",
         "ENTRY NO",
+        "SEAL NO",
         "VOL OBS",
         "VOL 20",
         "SELLING PRICE",
         "PAYMENT",
+        "AMOUNT PAID",
+        "LOADING DATE",
+        "REMARKS",
     ]
     if list(headers) == my_headers:
         check = True
@@ -177,21 +182,34 @@ def upload(row, depot, save):
     product = row[1]
     customer = row[2]
     truck = row[3]
-    truck = row[3]
-    order_no = row[4]
-    lpo_no = row[5]
-    entry_no = row[6]
-    vol_obs = int(row[7])
-    vol_20 = int(row[8]) if row[8] != None else row[8]
-    selling_price = float(row[9])
-    is_paid = True if row[10] == "Yes" else False
-
+    driver = row[4]
+    order_no = row[5]
+    lpo_no = row[6]
+    entry_no = row[7]
+    seal_no = row[8]
+    vol_obs = int(row[9])
+    vol_20 = int(row[10]) if row[10] != None else row[10]
+    selling_price = float(row[11])
+    is_paid = True if row[12] == "Yes" else False
+    amount_paid = int(row[13]) if row[13] != None else None
+    loading_date = row[14]
+    remarks = row[15]
     customer = Customer.objects.get(name=customer)
-    truck = Truck.objects.get(plate_no=truck)
+
     product = Product.objects.get(name=product)
 
     if save:
-        print(truck)
+        trucks = Truck.objects.filter(plate_no=truck)
+        if trucks.exists():
+            truck = trucks.last()
+            if truck.driver.name != driver:
+                driver = Driver.objects.create(name=driver)
+                truck.driver = driver
+                truck.save()
+        else:
+            driver = Driver.objects.create(name=driver)
+            truck = Truck.objects.create(customer=None, plate_no=truck, driver=driver)
+
         sale = Sale.objects.create(
             product=product,
             depot=depot,
@@ -205,8 +223,21 @@ def upload(row, depot, save):
             vol_20=vol_20,
             selling_price=selling_price,
             is_paid=is_paid,
+            seal_no=seal_no,
+            amount_paid=amount_paid,
+            loading_date=loading_date,
+            remarks=remarks,
         )
     else:
+        trucks = Truck.objects.filter(plate_no=truck)
+        if trucks.exists():
+            truck = trucks.last()
+            if truck.driver.name != driver:
+                driver = Driver(name=driver)
+                truck.driver = driver
+        else:
+            driver = Driver(name=driver)
+            truck = Truck(plate_no=truck, driver=driver)
         sale = Sale(
             product=product,
             depot=depot,
@@ -219,6 +250,10 @@ def upload(row, depot, save):
             vol_20=vol_20,
             selling_price=selling_price,
             is_paid=is_paid,
+            seal_no=seal_no,
+            amount_paid=amount_paid,
+            loading_date=loading_date,
+            remarks=remarks,
         )
     return True
 
@@ -239,6 +274,7 @@ class HandleExcelUpload(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
+        print("*" * 100)
         up(self.reader, self.depot, True)
 
 

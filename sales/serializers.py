@@ -31,6 +31,10 @@ class CreateSaleSer(ModelSerializer):
             "selling_price",
             "vol_obs",
             "vol_20",
+            "amount_paid",
+            "seal_no",
+            "remarks",
+            "loading_date",
         ]
 
 
