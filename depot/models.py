@@ -12,7 +12,7 @@ class Depot(models.Model):
 
     def save(self, *args, **kwargs):
         super(Depot, self).save(*args, **kwargs)
-        cache.delete("depot")
+        cache.delete("depots")
         # cache.delete("customer-{}".format(self.pk))
 
     def __str__(self) -> str:
