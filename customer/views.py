@@ -31,7 +31,7 @@ class CreateCustomerView(ListCreateAPIView):
             return Response(e)
         else:
             entries = (
-                Customer.objects.all().order_by("name").prefetch_related("truck_set")
+                Customer.objects.prefetch_related("truck_set").all().order_by("name")
             )
             serializer = RetrieveCustomerSer(entries, many=True)
             cache.set("customer", serializer.data)
@@ -128,7 +128,10 @@ class CreateTruckView(ListCreateAPIView):
         last_name = request.data.get("last_name")
         customer_id = request.data.get("customer")
         plate_no = request.data.get("plate_no")
-
+        if last_name:
+            name = str(first_name) + " " + last_name
+        else:
+            name = first_name
         if first_name and last_name:
 
             if customer_id != None:
@@ -139,8 +142,7 @@ class CreateTruckView(ListCreateAPIView):
             if trucks.exists():
                 truck = trucks.last()
                 driver = truck.driver
-                driver.first_name = first_name
-                driver.last_name = last_name
+                driver.name = name
                 driver.save()
 
                 truck.driver = driver
@@ -148,20 +150,12 @@ class CreateTruckView(ListCreateAPIView):
                 truck.plate_no = plate_no
                 truck.save()
             else:
-                driver = Driver.objects.create(
-                    first_name=first_name, last_name=last_name
-                )
+                driver = Driver.objects.create(name=name)
                 truck = Truck.objects.create(
                     customer=customer, plate_no=plate_no, driver=driver
                 )
-            customers = (
-                (Customer.objects.prefetch_related("sale_set")).all().order_by("name")
-            )
-            serializer = (
-                RetrieveCustomerSer(customers, many=True)
-                if customer_id
-                else RetrieveTruckSer(customer.truck_set, many=True)
-            )
+
+            serializer = RetrieveTruckSer(truck)
             return Response(serializer.data)
         else:
             Response(

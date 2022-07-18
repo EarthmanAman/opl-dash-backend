@@ -31,6 +31,7 @@ class RetrieveCustomerSer(ModelSerializer):
     class Meta:
         model = Customer
         fields = ["id", "code", "name", "trucks"]
+        read_only_fields = fields
 
     def get_trucks(self, obj):
         return RetrieveTruckSer(obj.truck_set, many=True).data
@@ -89,7 +90,10 @@ class RetrieveTruckSer(ModelSerializer):
             "is_hired",
         ]
 
+        read_only_fields = fields
+
     def get_driver(self, obj):
+        print("in hereee")
         return obj.driver.name
 
 
