@@ -207,8 +207,11 @@ def upload(row, depot, save):
                 truck.driver = driver
                 truck.save()
         else:
-            driver = Driver.objects.create(name=driver)
-            truck = Truck.objects.create(customer=None, plate_no=truck, driver=driver)
+            if truck:
+                driver = Driver.objects.create(name=driver)
+                truck = Truck.objects.create(
+                    customer=None, plate_no=truck, driver=driver
+                )
 
         sale = Sale.objects.create(
             product=product,

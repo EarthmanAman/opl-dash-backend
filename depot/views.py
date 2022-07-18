@@ -178,9 +178,9 @@ class DepotCustomerMonthView(RetrieveAPIView):
         # return Response(e)
 
 
-def customers_formula(depot):
+def customers_formula():
     # customers = depot.depotcustomer_set.all().order_by("customer__name")
-    customers = Customer.objects.all()
+    customers = Customer.objects.all().order_by("name")
     return customers
 
 
@@ -223,18 +223,12 @@ def create_excel(depot):
         "LOADING DATE",
         "REMARKS",
     ]
-    customers = customers_formula(depot)
+    customers = customers_formula()
     products = products_formula()
     sheet = wb.active
     ws2 = wb.create_sheet(title="customers")
-    ws3 = wb.create_sheet(title="trucks")
-    letter = None
     for idx, customer in enumerate(customers):
         ws2[f"A{idx+1}"] = customer.name
-        letter = get_column_letter(idx + 1)
-        ws3[f"{letter}1"] = customer.name
-        for index, truck in enumerate(customer.truck_set.all()):
-            ws3[f"{letter}{index+2}"] = truck.plate_no
     dv = DataValidation(
         type="list",
         formula1="=OFFSET('customers'!$A$1,0,0,COUNTA('customers'!$A:$A) - 0,1)",
