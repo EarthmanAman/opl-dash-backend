@@ -36,7 +36,6 @@ def simple_upload(request):
         result = person_resource.import_data(
             dataset, dry_run=True
         )  # Test the data import
-        print(result.has_errors())
         if not result.has_errors():
             person_resource.import_data(dataset, dry_run=False)  # Actually import now
 
@@ -80,7 +79,6 @@ class CreateSaleView(ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = CreateSaleSer(data=request.data)
-        print(request.data)
         if serializer.is_valid():
             sale = serializer.save()
             start_date = request.GET.get("start_date", None)
@@ -101,7 +99,7 @@ class CreateSaleView(ListCreateAPIView):
             serializer = RetrieveSaleSer(entries, many=True)
             return Response(serializer.data)
         else:
-            print(serializer.errors)
+            None
 
 
 class RetrieveSaleView(RetrieveUpdateAPIView):
@@ -200,6 +198,7 @@ def upload(row, depot, save):
 
     if save:
         trucks = Truck.objects.filter(plate_no=truck)
+        print(date.year)
         if trucks.exists():
             truck = trucks.last()
             if truck.driver.name != driver:
@@ -214,7 +213,6 @@ def upload(row, depot, save):
                 )
         sales = Sale.objects.filter(order_no=order_no)
         exist = False
-        print(sales)
         for sale in sales:
             if (
                 sale.entry_no == entry_no
@@ -244,6 +242,9 @@ def upload(row, depot, save):
                 remarks=remarks,
             )
     else:
+        if type(date) == str or type(loading_date) == str:
+            return False
+
         trucks = Truck.objects.filter(plate_no=truck)
         if trucks.exists():
             truck = trucks.last()

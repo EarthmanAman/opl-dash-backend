@@ -93,7 +93,6 @@ class RetrieveTruckSer(ModelSerializer):
         read_only_fields = fields
 
     def get_driver(self, obj):
-        print("in hereee")
         return obj.driver.name
 
 

@@ -50,7 +50,7 @@ class CreateCustomerView(ListCreateAPIView):
             cache.set("customer", serializer.data)
             return Response(serializer.data)
         else:
-            print(serializer.errors)
+            None
 
 
 class CreateC(ListCreateAPIView):
