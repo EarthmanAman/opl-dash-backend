@@ -74,4 +74,4 @@ class RetrieveSaleSer(ModelSerializer):
     def get_truck(self, obj) -> Str:
         if obj.truck == None:
             return {"plate_no": None, "driver": None}
-        return {"plate_no": obj.truck.plate_no, "driver": obj.truck.driver.first_name}
+        return {"plate_no": obj.truck.plate_no, "driver": obj.truck.driver.name}
