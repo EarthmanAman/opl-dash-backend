@@ -6,7 +6,15 @@ from depot.models import Depot
 from product.models import Product
 
 
-class Sale(models.Model):
+class BaseModel(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    modified_date = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    class Meta:
+        abstract = True
+
+
+class Sale(BaseModel):
     # Relations
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
     depot = models.ForeignKey(Depot, on_delete=models.PROTECT)

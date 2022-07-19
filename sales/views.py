@@ -212,25 +212,37 @@ def upload(row, depot, save):
                 truck = Truck.objects.create(
                     customer=None, plate_no=truck, driver=driver
                 )
-
-        sale = Sale.objects.create(
-            product=product,
-            depot=depot,
-            truck=truck,
-            customer=customer,
-            date=date,
-            order_no=order_no,
-            lpo_no=lpo_no,
-            entry_no=entry_no,
-            vol_obs=vol_obs,
-            vol_20=vol_20,
-            selling_price=selling_price,
-            is_paid=is_paid,
-            seal_no=seal_no,
-            amount_paid=amount_paid,
-            loading_date=loading_date,
-            remarks=remarks,
-        )
+        sales = Sale.objects.filter(order_no=order_no)
+        exist = False
+        print(sales)
+        for sale in sales:
+            if (
+                sale.entry_no == entry_no
+                and sale.vol_obs == float(vol_obs)
+                and sale.vol_20 == float(vol_20)
+                and sale.product == product
+                and sale.customer == customer
+            ):
+                exist = True
+        if not exist:
+            sale = Sale.objects.create(
+                product=product,
+                depot=depot,
+                truck=truck,
+                customer=customer,
+                date=date,
+                order_no=order_no,
+                lpo_no=lpo_no,
+                entry_no=entry_no,
+                vol_obs=vol_obs,
+                vol_20=vol_20,
+                selling_price=selling_price,
+                is_paid=is_paid,
+                seal_no=seal_no,
+                amount_paid=amount_paid,
+                loading_date=loading_date,
+                remarks=remarks,
+            )
     else:
         trucks = Truck.objects.filter(plate_no=truck)
         if trucks.exists():
