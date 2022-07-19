@@ -185,7 +185,7 @@ def upload(row, depot, save):
     lpo_no = row[6]
     entry_no = row[7]
     seal_no = row[8]
-    vol_obs = int(row[9])
+    vol_obs = int(row[9]) if row[9] != None else row[9]
     vol_20 = int(row[10]) if row[10] != None else row[10]
     selling_price = float(row[11])
     is_paid = True if row[12] == "Yes" else False
@@ -198,7 +198,7 @@ def upload(row, depot, save):
 
     if save:
         trucks = Truck.objects.filter(plate_no=truck)
-        print(date.year)
+        print(type(date))
         if trucks.exists():
             truck = trucks.last()
             if truck.driver.name != driver:
@@ -242,7 +242,8 @@ def upload(row, depot, save):
                 remarks=remarks,
             )
     else:
-        if type(date) == str or type(loading_date) == str:
+        print(type(date))
+        if type(date) == str:
             return False
 
         trucks = Truck.objects.filter(plate_no=truck)
