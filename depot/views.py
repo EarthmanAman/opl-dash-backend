@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from openpyxl import Workbook
 from openpyxl.worksheet.datavalidation import DataValidation
-from openpyxl.styles import PatternFill, Font, Alignment, Protection
+from openpyxl.styles import PatternFill, Font, Alignment, Protection, NamedStyle
 from openpyxl.utils import get_column_letter
 from customer.models import Customer
 from depot.models import Depot
@@ -227,6 +227,8 @@ def create_excel(depot):
     products = products_formula()
     sheet = wb.active
     ws2 = wb.create_sheet(title="customers")
+    date_style = NamedStyle(name='date', number_format='YYYY/MM/DD')
+    
     for idx, customer in enumerate(customers):
         ws2[f"A{idx+1}"] = customer.name
     dv = DataValidation(
@@ -251,6 +253,7 @@ def create_excel(depot):
 
     for idx, column in enumerate(columns):
         l = get_column_letter(idx + 1)
+
         sheet[f"{l}{2}"] = column
 
         sheet[f"{l}{2}"].font = font

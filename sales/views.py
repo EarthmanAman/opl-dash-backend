@@ -176,103 +176,114 @@ def check_headers(file):
 
 
 def upload(row, depot, save):
-    date = row[0]
-    product = row[1]
-    customer = row[2]
-    truck = row[3]
-    driver = row[4]
-    order_no = row[5]
-    lpo_no = row[6]
-    entry_no = row[7]
-    seal_no = row[8]
-    vol_obs = int(row[9]) if row[9] != None else row[9]
-    vol_20 = int(row[10]) if row[10] != None else row[10]
-    selling_price = float(row[11])
-    is_paid = True if row[12] == "Yes" else False
-    amount_paid = int(row[13]) if row[13] != None else None
-    loading_date = row[14]
-    remarks = row[15]
-    customer = Customer.objects.get(name=customer)
+    try:
+        date = row[0]
+        product = row[1]
+        customer = row[2]
+        truck = row[3]
+        driver = row[4]
+        order_no = row[5]
+        lpo_no = row[6]
+        entry_no = row[7]
+        seal_no = row[8]
+        vol_obs = int(row[9]) if row[9] != None else row[9]
+        vol_20 = int(row[10]) if row[10] != None else row[10]
+        selling_price = float(row[11]) if row[11] != None else row[11]
+        is_paid = True if row[12] == "Yes" else False
+        amount_paid = int(row[13]) if row[13] != None else None
+        loading_date = row[14]
+        remarks = row[15]
 
-    product = Product.objects.get(name=product)
+        if (
+            date != None
+            and order_no != None
+            and selling_price != None
+            and vol_obs != None
+        ):
+            customer = Customer.objects.get(name=customer)
 
-    if save:
-        trucks = Truck.objects.filter(plate_no=truck)
-        print(type(date))
-        if trucks.exists():
-            truck = trucks.last()
-            if truck.driver.name != driver:
-                driver = Driver.objects.create(name=driver)
-                truck.driver = driver
-                truck.save()
-        else:
-            if truck:
-                driver = Driver.objects.create(name=driver)
-                truck = Truck.objects.create(
-                    customer=None, plate_no=truck, driver=driver
+            product = Product.objects.get(name=product)
+            if save:
+                trucks = Truck.objects.filter(plate_no=truck)
+                print(type(date))
+                if trucks.exists():
+                    truck = trucks.last()
+                    if truck.driver.name != driver:
+                        driver = Driver.objects.create(name=driver)
+                        truck.driver = driver
+                        truck.save()
+                else:
+                    if truck:
+                        driver = Driver.objects.create(name=driver)
+                        truck = Truck.objects.create(
+                            customer=None, plate_no=truck, driver=driver
+                        )
+                sales = Sale.objects.filter(order_no=order_no)
+                exist = False
+                for sale in sales:
+                    if (
+                        sale.entry_no == entry_no
+                        and sale.vol_obs == float(vol_obs)
+                        and sale.vol_20 == float(vol_20)
+                        and sale.product == product
+                        and sale.customer == customer
+                    ):
+                        exist = True
+                if not exist:
+                    sale = Sale.objects.create(
+                        product=product,
+                        depot=depot,
+                        truck=truck,
+                        customer=customer,
+                        date=date,
+                        order_no=order_no,
+                        lpo_no=lpo_no,
+                        entry_no=entry_no,
+                        vol_obs=vol_obs,
+                        vol_20=vol_20,
+                        selling_price=selling_price,
+                        is_paid=is_paid,
+                        seal_no=seal_no,
+                        amount_paid=amount_paid,
+                        loading_date=loading_date,
+                        remarks=remarks,
+                    )
+            else:
+                if type(date) == str:
+                    return False
+
+                trucks = Truck.objects.filter(plate_no=truck)
+                if trucks.exists():
+                    truck = trucks.last()
+                    if truck.driver.name != driver:
+                        driver = Driver(name=driver)
+                        truck.driver = driver
+                else:
+                    driver = Driver(name=driver)
+                    truck = Truck(plate_no=truck, driver=driver)
+                sale = Sale(
+                    product=product,
+                    depot=depot,
+                    truck=truck,
+                    date=date,
+                    order_no=order_no,
+                    lpo_no=lpo_no,
+                    entry_no=entry_no,
+                    vol_obs=vol_obs,
+                    vol_20=vol_20,
+                    selling_price=selling_price,
+                    is_paid=is_paid,
+                    seal_no=seal_no,
+                    amount_paid=amount_paid,
+                    loading_date=loading_date,
+                    remarks=remarks,
                 )
-        sales = Sale.objects.filter(order_no=order_no)
-        exist = False
-        for sale in sales:
-            if (
-                sale.entry_no == entry_no
-                and sale.vol_obs == float(vol_obs)
-                and sale.vol_20 == float(vol_20)
-                and sale.product == product
-                and sale.customer == customer
-            ):
-                exist = True
-        if not exist:
-            sale = Sale.objects.create(
-                product=product,
-                depot=depot,
-                truck=truck,
-                customer=customer,
-                date=date,
-                order_no=order_no,
-                lpo_no=lpo_no,
-                entry_no=entry_no,
-                vol_obs=vol_obs,
-                vol_20=vol_20,
-                selling_price=selling_price,
-                is_paid=is_paid,
-                seal_no=seal_no,
-                amount_paid=amount_paid,
-                loading_date=loading_date,
-                remarks=remarks,
-            )
-    else:
-        print(type(date))
-        if type(date) == str:
-            return False
-
-        trucks = Truck.objects.filter(plate_no=truck)
-        if trucks.exists():
-            truck = trucks.last()
-            if truck.driver.name != driver:
-                driver = Driver(name=driver)
-                truck.driver = driver
+            return True
         else:
-            driver = Driver(name=driver)
-            truck = Truck(plate_no=truck, driver=driver)
-        sale = Sale(
-            product=product,
-            depot=depot,
-            truck=truck,
-            date=date,
-            order_no=order_no,
-            lpo_no=lpo_no,
-            entry_no=entry_no,
-            vol_obs=vol_obs,
-            vol_20=vol_20,
-            selling_price=selling_price,
-            is_paid=is_paid,
-            seal_no=seal_no,
-            amount_paid=amount_paid,
-            loading_date=loading_date,
-            remarks=remarks,
-        )
-    return True
+            return True
+    except Exception as e:
+        print(e)
+        return False
 
 
 def up(reader, depot, save):
