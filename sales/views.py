@@ -194,12 +194,7 @@ def upload(row, depot, save):
         loading_date = row[14]
         remarks = row[15]
 
-        if (
-            date != None
-            and order_no != None
-            and selling_price != None
-            and vol_obs != None
-        ):
+        if date != None or order_no != None or selling_price != None or vol_obs != None:
             customer = Customer.objects.get(name=customer)
 
             product = Product.objects.get(name=product)
