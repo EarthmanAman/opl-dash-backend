@@ -175,6 +175,14 @@ def check_headers(file):
     return check, reader
 
 
+def float_conversion_check(value, name):
+    try:
+        value = float(value)
+        return value
+    except:
+        return f"One of the sales has {name} which is not a number"
+
+
 def upload(row, depot, save):
     try:
         date = row[0]
@@ -186,80 +194,82 @@ def upload(row, depot, save):
         lpo_no = row[6]
         entry_no = row[7]
         seal_no = row[8]
-        vol_obs = int(row[9]) if row[9] != None else row[9]
-        vol_20 = int(row[10]) if row[10] != None else row[10]
-        selling_price = float(row[11]) if row[11] != None else row[11]
+        vol_obs = (
+            float_conversion_check(row[9], "Vol OBS") if row[9] != None else row[9]
+        )
+        vol_20 = (
+            float_conversion_check(row[10], "Vol @ 20") if row[10] != None else row[10]
+        )
+
+        selling_price = (
+            float_conversion_check(row[11], "Selling Price")
+            if row[11] != None
+            else row[11]
+        )
         is_paid = True if row[12] == "Yes" else False
-        amount_paid = int(row[13]) if row[13] != None else None
+        # amount_paid = int(row[13]) if row[13] != None else None
         loading_date = row[14]
         remarks = row[15]
 
-        if date != None or order_no != None or selling_price != None or vol_obs != None:
-            customer = Customer.objects.get(name=customer)
+        if order_no == None:
+            return [
+                False,
+                "One of the sales does not have an order no. Please check before uploading again.",
+            ]
+        elif vol_obs == None:
+            return [
+                False,
+                "One of the sales does not have vol obs. Please check before uploading again.",
+            ]
+        elif selling_price == None:
+            return [
+                False,
+                "One of the sales does not have selling price. Please check before uploading again.",
+            ]
+        elif type(vol_obs) == str:
+            return [False, vol_obs]
+        elif type(vol_20) == str:
+            return [False, vol_20]
 
-            product = Product.objects.get(name=product)
-            if save:
-                trucks = Truck.objects.filter(plate_no=truck)
-                print(type(date))
-                if trucks.exists():
-                    truck = trucks.last()
-                    if truck.driver.name != driver:
-                        driver = Driver.objects.create(name=driver)
-                        truck.driver = driver
-                        truck.save()
-                else:
-                    if truck:
-                        driver = Driver.objects.create(name=driver)
-                        truck = Truck.objects.create(
-                            customer=None, plate_no=truck, driver=driver
-                        )
-                sales = Sale.objects.filter(order_no=order_no)
-                exist = False
-                for sale in sales:
-                    if (
-                        sale.entry_no == entry_no
-                        and sale.vol_obs == float(vol_obs)
-                        and sale.vol_20 == float(vol_20)
-                        and sale.product == product
-                        and sale.customer == customer
-                    ):
-                        exist = True
-                if not exist:
-                    sale = Sale.objects.create(
-                        product=product,
-                        depot=depot,
-                        truck=truck,
-                        customer=customer,
-                        date=date,
-                        order_no=order_no,
-                        lpo_no=lpo_no,
-                        entry_no=entry_no,
-                        vol_obs=vol_obs,
-                        vol_20=vol_20,
-                        selling_price=selling_price,
-                        is_paid=is_paid,
-                        seal_no=seal_no,
-                        amount_paid=amount_paid,
-                        loading_date=loading_date,
-                        remarks=remarks,
-                    )
+        customers = Customer.objects.filter(name=customer)
+        if customers.exists():
+            customer = customers.last()
+        else:
+            return [
+                False,
+                "The customer you enter in one of the sales does not exist. Make sure you select the customer from the dropdown list.",
+            ]
+
+        products = Product.objects.filter(name=product)
+        if products.exists():
+            product = products.last()
+        else:
+            return [
+                False,
+                "The product you entered in one of the sales does not exist. Make sure you select the product from the dropdown list.",
+            ]
+
+        if save:
+            trucks = Truck.objects.filter(plate_no=truck)
+            if trucks.exists():
+                truck = trucks.last()
+                if truck.driver.name != driver:
+                    driver = Driver.objects.create(name=driver)
+                    truck.driver = driver
+                    truck.save()
             else:
-                if type(date) == str:
-                    return False
-
-                trucks = Truck.objects.filter(plate_no=truck)
-                if trucks.exists():
-                    truck = trucks.last()
-                    if truck.driver.name != driver:
-                        driver = Driver(name=driver)
-                        truck.driver = driver
-                else:
-                    driver = Driver(name=driver)
-                    truck = Truck(plate_no=truck, driver=driver)
-                sale = Sale(
+                if truck:
+                    driver = Driver.objects.create(name=driver)
+                    truck = Truck.objects.create(
+                        customer=customer, plate_no=truck, driver=driver
+                    )
+            sales = Sale.objects.filter(order_no=order_no)
+            if not sales.exists():
+                sale = Sale.objects.create(
                     product=product,
                     depot=depot,
                     truck=truck,
+                    customer=customer,
                     date=date,
                     order_no=order_no,
                     lpo_no=lpo_no,
@@ -269,24 +279,63 @@ def upload(row, depot, save):
                     selling_price=selling_price,
                     is_paid=is_paid,
                     seal_no=seal_no,
-                    amount_paid=amount_paid,
                     loading_date=loading_date,
                     remarks=remarks,
                 )
-            return True
         else:
-            return True
+            if type(date) == str or type(loading_date) == str:
+                return [
+                    False,
+                    "Check your dates they appear as strings. You can fix it by selecting the date column. Then press ctrl+1. select date the 14-07-12 format.",
+                ]
+
+            trucks = Truck.objects.filter(plate_no=truck)
+            if trucks.exists():
+                truck = trucks.last()
+            else:
+                driver = Driver(name=driver)
+                truck = Truck(plate_no=truck, driver=driver)
+            sales = Sale.objects.values("order_no").filter(order_no=order_no)
+            if sales.exists():
+                return [
+                    False,
+                    f"Order no: {order_no} is already in the system. Please check the sale record.",
+                ]
+
+            sale = Sale(
+                product=product,
+                depot=depot,
+                truck=truck,
+                date=date,
+                order_no=order_no,
+                lpo_no=lpo_no,
+                entry_no=entry_no,
+                vol_obs=vol_obs,
+                vol_20=vol_20,
+                selling_price=selling_price,
+                is_paid=is_paid,
+                seal_no=seal_no,
+                loading_date=loading_date,
+                remarks=remarks,
+            )
+        return [True, "File Uploaded Successful"]
+
     except Exception as e:
         print(e)
-        return False
+        return [False, "An unknown error occured. Contact the admin"]
 
 
 def up(reader, depot, save):
+    order_nos = []
     for row in reader:
-        succesful = upload(row, depot, save=save)
-        if not succesful:
-            return False
-    return True
+        if row[5] in order_nos:
+            return [False, "Two sales have the same order no. Please check"]
+        if row[0] != None and row[1] != None and row[2] != None:
+            succesful = upload(row, depot, save=save)
+            if not succesful[0]:
+                return [False, succesful[1]]
+        order_nos.append(row[5])
+    return [True, "File uploaded successful"]
 
 
 class HandleExcelUpload(threading.Thread):
@@ -316,11 +365,11 @@ class UploadExcel(APIView):
             depot = depot.last()
 
             succesful = up(reader, depot, save=False)
-            if succesful == False:
+            if succesful[0] == False:
                 return Response(
                     {
                         "status": "fail",
-                        "message": "Error in the data. Please check or contact admin.",
+                        "message": succesful[1],
                     }
                 )
             HandleExcelUpload(reader, depot).start()
@@ -329,5 +378,8 @@ class UploadExcel(APIView):
         else:
 
             return Response(
-                {"status": "fail", "message": "Make sure the file used is correct."}
+                {
+                    "status": "fail",
+                    "message": "Make sure the file used is has correct headers as the template. Do not add any new column",
+                }
             )
