@@ -165,7 +165,7 @@ def check_headers(file):
         "VOL 20",
         "SELLING PRICE",
         "PAYMENT",
-        "AMOUNT PAID",
+        # "AMOUNT PAID",
         "LOADING DATE",
         "REMARKS",
     ]

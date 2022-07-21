@@ -219,7 +219,7 @@ def create_excel(depot):
         "VOL 20",
         "SELLING PRICE",
         "PAYMENT",
-        "AMOUNT PAID",
+        # "AMOUNT PAID",
         "LOADING DATE",
         "REMARKS",
     ]
@@ -227,8 +227,8 @@ def create_excel(depot):
     products = products_formula()
     sheet = wb.active
     ws2 = wb.create_sheet(title="customers")
-    date_style = NamedStyle(name='date', number_format='YYYY/MM/DD')
-    
+    date_style = NamedStyle(name="date", number_format="YYYY/MM/DD")
+
     for idx, customer in enumerate(customers):
         ws2[f"A{idx+1}"] = customer.name
     dv = DataValidation(
@@ -244,7 +244,7 @@ def create_excel(depot):
     # )
     dv4 = DataValidation(type="list", formula1=f'"YES, NO"', allow_blank=False)
 
-    sheet["A1"].value = depot.name
+    sheet["A1"].value = depot.name + " (Do not add any column or formula)"
     sheet["A1"].alignment = Alignment(horizontal="center", vertical="center")
     sheet["A1"].font = Font(size=16, bold=True)
     sheet["A1"].fill = PatternFill("solid", start_color="00CCFFCC")
