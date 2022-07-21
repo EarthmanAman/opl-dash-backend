@@ -78,6 +78,16 @@ class CreateSaleView(ListCreateAPIView):
         return Response(serializer.data)
 
     def post(self, request, *args, **kwargs):
+        sales = Sale.objects.values("order_no").filter(
+            order_no=request.data["order_no"]
+        )
+        if sales.exists():
+            return Response(
+                {
+                    "status": "fail",
+                    "message": "Another sale with the given order_no already exist in the system. Please check the order no.",
+                }
+            )
         serializer = CreateSaleSer(data=request.data)
         if serializer.is_valid():
             sale = serializer.save()
@@ -105,31 +115,6 @@ class CreateSaleView(ListCreateAPIView):
 class RetrieveSaleView(RetrieveUpdateAPIView):
     serializer_class = RetrieveSaleSer
     queryset = Sale.objects.all()
-
-
-# class UploadExcel(APIView):
-#     parser_classes = (MultiPartParser,)
-
-#     def post(self, request, *args, **kwargs):
-#         sale_resource = SaleResource()
-#         dataset = Dataset()
-#         file = request.FILES["file"]
-#         r = file.read()
-#         imported_data = dataset.load(r)
-#         result = sale_resource.import_data(
-#             dataset, dry_run=True
-#         )  # Test the data import
-#         if not result.has_errors():
-#             # sale_resource.import_data(dataset, dry_run=False)  # Actually import now
-#             return Response(
-#                 {"status": status.HTTP_201_CREATED, "message": "Upload successful"}
-#             )
-#         return Response(
-#             {
-#                 "status": status.HTTP_403_FORBIDDEN,
-#                 "message": "Check your file format. If error persist contact admin",
-#             }
-#         )
 
 
 def check_headers(file):
