@@ -125,6 +125,7 @@ class ProductTopCustomerMonthSer(ModelSerializer):
             "revenue",
             # "quantity",
         ]
+        read_only_fields = fields
 
     def calc(self, obj, year, month):
 
