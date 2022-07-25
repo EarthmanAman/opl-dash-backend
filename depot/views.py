@@ -237,11 +237,6 @@ def create_excel(depot):
         allow_blank=False,
     )
     dv2 = DataValidation(type="list", formula1=f'"{products}"', allow_blank=False)
-    # dv3 = DataValidation(
-    #     type="list",
-    #     formula1=f"=OFFSET(trucks!$A$1,1, MATCH($C3, trucks!$A$1:${letter}$1,0)-1,COUNTA(OFFSET(trucks!$A$1,1, MATCH($C3, trucks!$A$1:${letter}$1,0)-1,200,1)),1)",
-    #     allow_blank=True,
-    # )
     dv4 = DataValidation(type="list", formula1=f'"YES, NO"', allow_blank=False)
 
     sheet["A1"].value = depot.name + " (Do not add any column or formula)"
@@ -262,12 +257,10 @@ def create_excel(depot):
         sheet.column_dimensions[l].width = 20.0
     sheet.row_dimensions[1].height = 27.0
     dv.add("C3:C100000")
-    # dv3.add("D3:D100000")
     dv2.add("B3:b100000")
     dv4.add("M3:M100000")
     sheet.add_data_validation(dv)
     sheet.add_data_validation(dv2)
-    # sheet.add_data_validation(dv3)
     sheet.add_data_validation(dv4)
     wb.save(f"DailyReportTemplate{depot.id}.xlsx")
 

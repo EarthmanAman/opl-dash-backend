@@ -135,7 +135,7 @@ def check_headers(file):
         data = [sheet.row_values(rowx) for rowx in range(sheet.nrows)]
         headers = data[1]
         reader = data[2:]
-
+    print(headers)
     my_headers = [
         "DATE",
         "PRODUCT",
@@ -150,11 +150,10 @@ def check_headers(file):
         "VOL 20",
         "SELLING PRICE",
         "PAYMENT",
-        # "AMOUNT PAID",
         "LOADING DATE",
         "REMARKS",
     ]
-    if list(headers) == my_headers:
+    if my_headers == list(headers)[:-1]:
         check = True
 
     return check, reader
