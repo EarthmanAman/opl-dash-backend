@@ -247,25 +247,23 @@ def upload(row, depot, save):
                     truck = Truck.objects.create(
                         customer=customer, plate_no=truck, driver=driver
                     )
-            sales = Sale.objects.filter(order_no=order_no)
-            if not sales.exists():
-                sale = Sale.objects.create(
-                    product=product,
-                    depot=depot,
-                    truck=truck,
-                    customer=customer,
-                    date=date,
-                    order_no=order_no,
-                    lpo_no=lpo_no,
-                    entry_no=entry_no,
-                    vol_obs=vol_obs,
-                    vol_20=vol_20,
-                    selling_price=selling_price,
-                    is_paid=is_paid,
-                    seal_no=seal_no,
-                    loading_date=loading_date,
-                    remarks=remarks,
-                )
+            sale = Sale.objects.create(
+                product=product,
+                depot=depot,
+                truck=truck,
+                customer=customer,
+                date=date,
+                order_no=order_no,
+                lpo_no=lpo_no,
+                entry_no=entry_no,
+                vol_obs=vol_obs,
+                vol_20=vol_20,
+                selling_price=selling_price,
+                is_paid=is_paid,
+                seal_no=seal_no,
+                loading_date=loading_date,
+                remarks=remarks,
+            )
         else:
             if type(date) == str or type(loading_date) == str:
                 return [
@@ -312,13 +310,21 @@ def upload(row, depot, save):
 def up(reader, depot, save):
     order_nos = []
     for row in reader:
-        if row[5] in order_nos:
-            return [False, "Two sales have the same order no. Please check"]
+        ors = list(filter(lambda d: d["order_no"] == row[5], order_nos))
+        if len(ors) > 0:
+            for ord in ors:
+                if ord["product"] == row[1]:
+                    return [
+                        False,
+                        "Two or more sales have the same order no. Please check",
+                    ]
         if row[0] != None and row[1] != None and row[2] != None:
             succesful = upload(row, depot, save=save)
             if not succesful[0]:
                 return [False, succesful[1]]
-        order_nos.append(row[5])
+        order_nos.append(
+            {"order_no": row[5], "customer": row[2], "date": row[0], "product": row[1]}
+        )
     return [True, "File uploaded successful"]
 
 
