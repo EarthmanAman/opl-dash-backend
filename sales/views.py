@@ -135,7 +135,6 @@ def check_headers(file):
         data = [sheet.row_values(rowx) for rowx in range(sheet.nrows)]
         headers = data[1]
         reader = data[2:]
-    print(headers)
     my_headers = [
         "DATE",
         "PRODUCT",
@@ -192,8 +191,8 @@ def upload(row, depot, save):
         )
         is_paid = True if row[12] == "Yes" else False
         # amount_paid = int(row[13]) if row[13] != None else None
-        loading_date = row[14]
-        remarks = row[15]
+        loading_date = row[13]
+        remarks = row[14]
 
         if order_no == None:
             return [
@@ -214,7 +213,6 @@ def upload(row, depot, save):
             return [False, vol_obs]
         elif type(vol_20) == str:
             return [False, vol_20]
-
         customers = Customer.objects.filter(name=customer)
         if customers.exists():
             customer = customers.last()
@@ -303,7 +301,6 @@ def upload(row, depot, save):
         return [True, "File Uploaded Successful"]
 
     except Exception as e:
-        print(e)
         return [False, "An unknown error occured. Contact the admin"]
 
 
