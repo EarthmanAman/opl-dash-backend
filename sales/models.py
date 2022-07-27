@@ -32,6 +32,7 @@ class Sale(BaseModel):
     selling_price = models.DecimalField(max_digits=12, decimal_places=2)
     vol_obs = models.FloatField()
     vol_20 = models.FloatField(null=True, blank=True)
+    cheque_dates = models.TextField(blank=True, null=True)
 
     amount_paid = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True

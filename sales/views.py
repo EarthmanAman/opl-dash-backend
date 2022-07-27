@@ -148,11 +148,12 @@ def check_headers(file):
         "VOL OBS",
         "VOL 20",
         "SELLING PRICE",
-        "PAYMENT",
+        "PAYMENT TERMS",
         "LOADING DATE",
-        "REMARKS",
+        "REMARKS/PD CHEQUES",
+        "CHEQUE DATES",
     ]
-    if my_headers == list(headers)[:-1]:
+    if my_headers == list(headers):
         check = True
 
     return check, reader
@@ -189,10 +190,11 @@ def upload(row, depot, save):
             if row[11] != None
             else row[11]
         )
-        is_paid = True if row[12] == "Yes" else False
+        is_paid = True if row[12] == "Debit" else False
         # amount_paid = int(row[13]) if row[13] != None else None
         loading_date = row[13]
         remarks = row[14]
+        cheque_dates = row[15]
 
         if order_no == None:
             return [
@@ -261,6 +263,7 @@ def upload(row, depot, save):
                 seal_no=seal_no,
                 loading_date=loading_date,
                 remarks=remarks,
+                cheque_dates=cheque_dates,
             )
         else:
             if type(date) == str or type(loading_date) == str:

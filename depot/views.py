@@ -218,10 +218,11 @@ def create_excel(depot):
         "VOL OBS",
         "VOL 20",
         "SELLING PRICE",
-        "PAYMENT",
+        "PAYMENT TERMS",
         # "AMOUNT PAID",
         "LOADING DATE",
-        "REMARKS",
+        "REMARKS/PD CHEQUES",
+        "CHEQUE DATES",
     ]
     customers = customers_formula()
     products = products_formula()
@@ -237,7 +238,7 @@ def create_excel(depot):
         allow_blank=False,
     )
     dv2 = DataValidation(type="list", formula1=f'"{products}"', allow_blank=False)
-    dv4 = DataValidation(type="list", formula1=f'"YES, NO"', allow_blank=False)
+    dv4 = DataValidation(type="list", formula1=f'"Debit, Credit"', allow_blank=False)
 
     sheet["A1"].value = depot.name + " (Do not add any column or formula)"
     sheet["A1"].alignment = Alignment(horizontal="center", vertical="center")
