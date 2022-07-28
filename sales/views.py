@@ -13,6 +13,7 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from yaml import load
 from customer.models import Customer, Driver, Truck
 from depot.models import Depot
 from product.models import Product
@@ -266,10 +267,15 @@ def upload(row, depot, save):
                 cheque_dates=cheque_dates,
             )
         else:
-            if type(date) == str or type(loading_date) == str:
+            if (
+                type(date) == str
+                or type(loading_date) == str
+                or type(date) == int
+                or type(loading_date) == int
+            ):
                 return [
                     False,
-                    "Check your dates they appear as strings. You can fix it by selecting the date column. Then press ctrl+1. select date the 14-07-12 format.",
+                    "Check your dates they appear as strings. You can fix it by selecting the date column. Then press ctrl+1. select date the 14-03-12 format.",
                 ]
 
             trucks = Truck.objects.filter(plate_no=truck)
